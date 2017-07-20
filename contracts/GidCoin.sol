@@ -6,6 +6,8 @@ contract GidCoin {
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public personalData; // TODO which type of data? it is not mapping because relation is one-to-many
 
+    event SomethingElseHappened(address who, uint256 amount); // simply event
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _; // yeeaaaah decorators! some strange decorators
@@ -18,6 +20,9 @@ contract GidCoin {
     function transfer(address _to, uint256 _value) {
         if (balanceOf[msg.sender] < _value) throw;
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
+
+        SomethingElseHappened(msg.sender, _value); // raise event
+
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
     }
