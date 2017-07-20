@@ -2,8 +2,14 @@ pragma solidity ^0.4.4;
 
 
 contract GidCoin {
+    mapping (address => uint8) public verifiers; // TODO it is just simply array
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public personalData; // TODO which type of data? it is not mapping because relation is one-to-many
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _; // yeeaaaah decorators! some strange decorators
+    }
 
     function GidCoin(uint256 initialSupply) {
         balanceOf[msg.sender] = initialSupply;
@@ -16,8 +22,9 @@ contract GidCoin {
         balanceOf[_to] += _value;
     }
 
-    function addPersonalData(string field, string value) {
-        personalData[_owner] = sha256(field + value); // TODO how to calculate a hash from data? and THIS IS NOT-F..G-MAPPING-DATA
+    function addPersonalData(string field, string value) constant returns (bytes32) {
+        address owner = msg.sender;
+        personalData[owner] = sha256(field + value); // TODO how to calculate a hash from data? and THIS IS NOT-F..G-MAPPING-DATA
     }
 
 }
