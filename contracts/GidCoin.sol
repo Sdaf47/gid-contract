@@ -9,6 +9,8 @@ contract GidCoin {
         bool proved;
     }
 
+    enum Role { User, Verifier, Admin }
+
     mapping (address => uint8) public verifiers; // TODO it is just simply array
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public personalData; // TODO which type of data? it is not mapping because relation is one-to-many
