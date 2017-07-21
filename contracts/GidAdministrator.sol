@@ -13,7 +13,8 @@ contract GidAdministrator {
     event BeforeAppoint(address _candidate, Role);
 
     modifier administration {
-        if (msg.sender != administrator) throw;
+        if (msg.sender != admin) throw;
+        _;
     }
 
     function appointVerifier(address _candidate) administration {
