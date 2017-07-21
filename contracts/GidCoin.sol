@@ -4,12 +4,11 @@ pragma solidity ^0.4.4;
 contract GidCoin {
 
     struct Liberated {// Struct like in golang
-    address who;
-    address verifier;
-    bool proved;
+        address who;
+        address verifier;
+        bool proved;
     }
 
-    enum Role {User, Verifier, Admin}
 
     Liberated slave;
 
