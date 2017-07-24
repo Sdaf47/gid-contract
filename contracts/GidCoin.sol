@@ -1,30 +1,20 @@
 pragma solidity ^0.4.4;
 
+import "./Structures.sol";
+
 
 contract GidCoin {
 
-    struct Liberated {// Struct like in golang
-        address who;
-        address verifier;
-        bool proved;
-    }
+    mapping (address => uint256) balanceOf;
+    mapping (address => Structures.Person) personalDataStorage;
+    mapping (address => Structures.Admin) administrators;
+    mapping (address => Structures.Admin) verifiers;
 
+    event BeforeAppoint(address _candidate);
 
-    Liberated slave;
-
-    mapping (address => uint8) public verifiers; // TODO it is just simply array
-    mapping (address => uint256) public balanceOf;
-
-    mapping (address => bytes32) public personalData; // TODO which type of data? it is not mapping because relation is one-to-many
-
-    event SomethingElseHappened(address who, uint256 amount); // simply event
-    event LibertyEvent(address sender, address slave, bool proved);
-
-    function liberate(address _to) {
-        balanceOf[_to] = 0;
-        balanceOf[msg.sender] += balanceOf[_to];
-        slave = Liberated(msg.sender, _to, true);
-        LibertyEvent(msg.sender, _to, true);
+    modifier administration {
+        if (administrators[msg.sender].active) throw;
+        _;
     }
 
     function GidCoin(uint256 initialSupply) {
@@ -42,21 +32,20 @@ contract GidCoin {
         balanceOf[_to] += _value;
     }
 
-    function addPersonalData(string field, string value) returns (bytes32) {
-        string memory recordHash = concatString(field, value);
-        personalData[msg.sender] = sha256(recordHash);
-        // TODO THIS IS NOT-F..G-MAPPING-DATA
+    function appointVerifier(address _candidate, string name) administration {
+        Structures.Admin memory verifier = Structures.Admin(name, true);
+        BeforeAppoint(_candidate);
+        verifiers[_candidate] = verifier;
     }
 
-    function concatString(string _s1, string _s2) returns (string) {
-        bytes memory _b1 = bytes(_s1);
-        bytes memory _b2 = bytes(_s2);
-        string memory s12 = new string(_b1.length + _b2.length);
-        bytes memory b12 = bytes(s12);
-        uint k = 0;
-        for (uint i = 0; i < _b1.length; i++) b12[k++] = _b1[i];
-        for (i = 0; i < _b2.length; i++) b12[k++] = _b2[i];
-        return string(b12);
+    function appointAdministrator(address _candidate, string name) administration {
+        Structures.Admin memory admin = Structures.Admin(name, true);
+        BeforeAppoint(_candidate);
+        administrators[_candidate] = admin;
+    }
+
+    function GidAdministrator() {
+        // todo who am i?
     }
 
 }
