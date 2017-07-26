@@ -12,40 +12,39 @@ contract GidCoin is ERC20 {
     uint256 public totalSupply;
 
     mapping (address => mapping (address => uint256)) allowed;
-    mapping (address => uint256) private balanceOf;
+    mapping (address => uint256) public balanceOf;
 
+    address private master;
     mapping (address => Structures.Person) private personalDataStorage;
     mapping (address => Structures.Admin) private administrators;
     mapping (address => Structures.Admin) private verifiers;
 
     function GidCoin(uint256 initialSupply) {
-        balanceOf[msg.sender] = initialSupply; // todo think
+        balanceOf[msg.sender] = initialSupply; // TODO think
+        master = msg.sender;
     }
 
     modifier administration {
-        if (administrators[msg.sender].active) throw;
+        // TODO to do =)
+        if (!administrators[msg.sender].active) throw;
         _;
     }
 
-    function approve(address _spender, uint _value) {
+    function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
+        success = true;
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (_to == 0x0) throw;
         if (balanceOf[_from] < _value) throw;
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
-        if (_value > allowance[_from][msg.sender]) throw;
+        if (_value > allowed[_from][msg.sender]) throw;
         balanceOf[_to] +=_value;
         balanceOf[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
-        success = true;
-    }
-
-    function approve(address _spender, uint256 _value) returns (bool success) {
-        allowance[msg.sender][_spender] = _value;
         success = true;
     }
 
@@ -71,7 +70,7 @@ contract GidCoin is ERC20 {
     }
 
     function GidAdministrator() {
-        // todo who am i?
+        // TODO who am i?
     }
 
 }
