@@ -4,11 +4,11 @@ pragma solidity ^0.4.0;
 library Structures {
 
     struct PersonalData {
-        string hash; // or special?
+        bytes32 hash;
     }
 
     struct Document {
-        string hash; // or special?
+        bytes32 hash;
     }
 
     struct Approval {

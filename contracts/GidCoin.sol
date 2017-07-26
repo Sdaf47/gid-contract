@@ -1,36 +1,62 @@
 pragma solidity ^0.4.4;
 
 import "./Structures.sol";
+import "./ERC20.sol";
 
 
-contract GidCoin {
+contract GidCoin is ERC20 {
+    string public standard = 'Token 0.1';
+    string public constant name = "GuardID Token";
+    string public constant symbol = "GID";
+    uint8 public constant decimals = 18;
+    uint256 public totalSupply;
 
-    mapping (address => uint256) balanceOf;
-    mapping (address => Structures.Person) personalDataStorage;
-    mapping (address => Structures.Admin) administrators;
-    mapping (address => Structures.Admin) verifiers;
+    mapping (address => mapping (address => uint256)) allowed;
+    mapping (address => uint256) private balanceOf;
 
-    event BeforeAppoint(address _candidate);
+    mapping (address => Structures.Person) private personalDataStorage;
+    mapping (address => Structures.Admin) private administrators;
+    mapping (address => Structures.Admin) private verifiers;
+
+    function GidCoin(uint256 initialSupply) {
+        balanceOf[msg.sender] = initialSupply; // todo think
+    }
 
     modifier administration {
         if (administrators[msg.sender].active) throw;
         _;
     }
 
-    function GidCoin(uint256 initialSupply) {
-        balanceOf[msg.sender] = initialSupply;
+    function approve(address _spender, uint _value) {
+        allowed[msg.sender][_spender] = _value;
+        Approval(msg.sender, _spender, _value);
     }
 
-    function transfer(address _to, uint256 _value) {
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+        if (_to == 0x0) throw;
+        if (balanceOf[_from] < _value) throw;
+        if (balanceOf[_to] + _value < balanceOf[_to]) throw;
+        if (_value > allowance[_from][msg.sender]) throw;
+        balanceOf[_to] +=_value;
+        balanceOf[_from] -= _value;
+        allowed[_from][msg.sender] -= _value;
+        Transfer(_from, _to, _value);
+        success = true;
+    }
+
+    function approve(address _spender, uint256 _value) returns (bool success) {
+        allowance[msg.sender][_spender] = _value;
+        success = true;
+    }
+
+    function transfer(address _to, uint256 _value) returns (bool success) {
         if (balanceOf[msg.sender] < _value) throw;
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
-
-        SomethingElseHappened(msg.sender, _value);
-        // raise event
-
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
     }
+
+    event BeforeAppoint(address _candidate);
 
     function appointVerifier(address _candidate, string name) administration {
         Structures.Admin memory verifier = Structures.Admin(name, true);
