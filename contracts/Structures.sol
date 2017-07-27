@@ -3,26 +3,27 @@ pragma solidity ^0.4.0;
 
 library Structures {
 
+    struct Organisation {
+        string name;
+        string some_data; // TODO what does org have?
+    }
+
     struct Passport {
         bytes32 first_name;
         bytes32 second_name;
         bytes32 last_name;
         bytes32 birthday;
-    }
-
-    struct PersonalData {
-        bytes32 hash;
-    }
-
-    struct Document {
-        bytes32 hash;
+        bytes32 number;
+        bytes32 gave;
     }
 
     // TODO may i use struct-object as reference, or struct-object to be clone?
     struct Verifier {
-        // [person][dataHash]
+        // verifier.dataApprove[person] => dataHash
         mapping (address => bytes32) dataApprove;
         address[] persons;
+        address administrator;
+        Organisation organisation;
     }
 
     struct Person {
@@ -38,4 +39,7 @@ library Structures {
         bool active;
         bool block;
     }
+
+    // TODO video and start_video
+
 }
