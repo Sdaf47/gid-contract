@@ -17,7 +17,6 @@ library Structures {
         bytes32 gave;
     }
 
-    // TODO may i use struct-object as reference, or struct-object to be clone?
     struct Verifier {
         // verifier.dataApprove[person] => dataHash
         mapping (address => bytes32) dataApprove;
@@ -29,7 +28,7 @@ library Structures {
     struct Person {
         // person.dataApprove[dataHash] = verifierAddress
         mapping (bytes32 => address) dataApprove;
-        mapping (bytes32 => mapping(bytes32 => bool)) signedDocuments;
+        mapping (bytes32 => bool) signedDocuments;
         address verifier;
         Passport passport;
     }

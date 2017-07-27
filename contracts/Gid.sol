@@ -8,13 +8,18 @@ import "./GidCoin.sol";
 
 contract Gid is Master, GidCoin {
 
-    mapping (address => Structures.Person) private personalDataStorage;
+    mapping (address => Structures.Person) private persons;
 
     mapping (address => Structures.Admin) private administrators;
-    mapping (address => Structures.Admin) private verifiers;
+    mapping (address => Structures.Verifier) private verifiers;
 
     modifier administration {
         require(administrators[msg.sender].active);
+        _;
+    }
+
+    modifier verifier {
+        require(verifiers[msg.sender].active);
         _;
     }
 
@@ -28,7 +33,28 @@ contract Gid is Master, GidCoin {
         verifiers[_candidate] = verifier;
     }
 
-    function GidAdministrator() {
-        // TODO who am i?
+    //
+
+    function createMyPerson(
+        bytes32 _first_name,
+        bytes32 _second_name,
+        bytes32 _last_name,
+        bytes32 _birthday,
+        bytes32 _number,
+        bytes32 _gave
+    ) verifier payable returns (bool status) {
+        Passport memory passport = Structure.Passport({
+            first_name: _first_name,
+            second_name: _second_name,
+            last_name: _last_name,
+            birthday: _birthday,
+            number: _number,
+            gave: _gave
+        });
+        persons[msg.sender] = Structures.Person({
+            verifier: 0,
+            passport: Password
+        });
     }
+
 }
