@@ -1,11 +1,9 @@
 pragma solidity ^0.4.4;
 
-import "./Structures.sol";
 import "./ERC20.sol";
-import "./Master.sol";
 
 
-contract GidCoin is ERC20, Master {
+contract GidCoin is ERC20 {
     string public standard = 'Token 0.1';
     string public constant name = "GuardID Token";
     string public constant symbol = "GID";
@@ -16,9 +14,6 @@ contract GidCoin is ERC20, Master {
     mapping (address => uint256) public balanceOf;
 
     address private master;
-    mapping (address => Structures.Person) private personalDataStorage;
-    mapping (address => Structures.Admin) private administrators;
-    mapping (address => Structures.Admin) private verifiers;
 
     function GidCoin(uint256 initialSupply, address _master) {
         balanceOf[msg.sender] = totalSupply = initialSupply;
@@ -48,35 +43,6 @@ contract GidCoin is ERC20, Master {
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-    }
-
-    function mintToken(address _target, uint256 _mintedAmount) onlyMaster {
-        balanceOf[_target] += _mintedAmount;
-        totalSupply += _mintedAmount;
-        Transfer(0, master, _mintedAmount);
-        Transfer(master, _target, _mintedAmount);
-    }
-
-    // contract
-
-    modifier administration {
-        // TODO how to check it?
-        if (!administrators[msg.sender].active) throw;
-        _;
-    }
-
-    function appointVerifier(address _candidate, string name) administration {
-        Structures.Admin memory verifier = Structures.Admin(name, true);
-        verifiers[_candidate] = verifier;
-    }
-
-    function appointAdministrator(address _candidate, string name) administration {
-        Structures.Admin memory admin = Structures.Admin(name, true);
-        administrators[_candidate] = admin;
-    }
-
-    function GidAdministrator() {
-        // TODO who am i?
     }
 
 }
