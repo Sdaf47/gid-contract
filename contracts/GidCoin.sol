@@ -2,9 +2,10 @@ pragma solidity ^0.4.4;
 
 import "./Structures.sol";
 import "./ERC20.sol";
+import "./Master.sol";
 
 
-contract GidCoin is ERC20 {
+contract GidCoin is ERC20, Master {
     string public standard = 'Token 0.1';
     string public constant name = "GuardID Token";
     string public constant symbol = "GID";
@@ -19,15 +20,9 @@ contract GidCoin is ERC20 {
     mapping (address => Structures.Admin) private administrators;
     mapping (address => Structures.Admin) private verifiers;
 
-    function GidCoin(uint256 initialSupply) {
-        balanceOf[msg.sender] = initialSupply; // TODO think
-        master = msg.sender;
-    }
-
-    modifier administration {
-        // TODO to do =)
-        if (!administrators[msg.sender].active) throw;
-        _;
+    function GidCoin(uint256 initialSupply, address _master) {
+        balanceOf[msg.sender] = totalSupply = initialSupply;
+        master = _master;
     }
 
     function approve(address _spender, uint256 _value) returns (bool success) {
@@ -55,17 +50,28 @@ contract GidCoin is ERC20 {
         balanceOf[_to] += _value;
     }
 
-    event BeforeAppoint(address _candidate);
+    function mintToken(address _target, uint256 _mintedAmount) onlyMaster {
+        balanceOf[_target] += _mintedAmount;
+        totalSupply += _mintedAmount;
+        Transfer(0, master, _mintedAmount);
+        Transfer(master, _target, _mintedAmount);
+    }
+
+    // contract
+
+    modifier administration {
+        // TODO how to check it?
+        if (!administrators[msg.sender].active) throw;
+        _;
+    }
 
     function appointVerifier(address _candidate, string name) administration {
         Structures.Admin memory verifier = Structures.Admin(name, true);
-        BeforeAppoint(_candidate);
         verifiers[_candidate] = verifier;
     }
 
     function appointAdministrator(address _candidate, string name) administration {
         Structures.Admin memory admin = Structures.Admin(name, true);
-        BeforeAppoint(_candidate);
         administrators[_candidate] = admin;
     }
 
