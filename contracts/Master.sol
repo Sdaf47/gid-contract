@@ -9,12 +9,12 @@ contract Master {
         master = msg.sender;
     }
 
-    modifier onlyOwner {
+    modifier onlyMaster {
         require(master == msg.sender);
         _;
     }
 
-    function changeOwner(address _master) onlyOwner public {
+    function changeOwner(address _master) onlyMaster public {
         require(_master != 0);
         master = _master;
     }

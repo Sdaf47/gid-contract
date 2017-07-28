@@ -5,7 +5,7 @@ import "./ERC20.sol";
 
 contract GidCoin is ERC20 {
     string public standard = 'Token 0.1';
-    string public constant name = "GuardID Token";
+    string public constant name = "Gid Coin";
     string public constant symbol = "GID";
     uint8 public constant decimals = 18;
     uint256 public totalSupply;
@@ -27,10 +27,10 @@ contract GidCoin is ERC20 {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        if (_to == 0x0) throw;
-        if (balanceOf[_from] < _value) throw;
-        if (balanceOf[_to] + _value < balanceOf[_to]) throw;
-        if (_value > allowed[_from][msg.sender]) throw;
+        require(_to != 0x0);
+        require(balanceOf[_from] >= _value);
+        require(balanceOf[_to] + _value >= balanceOf[_to]);
+        require(_value > allowed[_from][msg.sender]);
         balanceOf[_to] +=_value;
         balanceOf[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
@@ -39,10 +39,11 @@ contract GidCoin is ERC20 {
     }
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        if (balanceOf[msg.sender] < _value) throw;
-        if (balanceOf[_to] + _value < balanceOf[_to]) throw;
+        require(balanceOf[msg.sender] > _value);
+        require(balanceOf[_to] + _value > balanceOf[_to]);
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
+        success = true;
     }
 
 }

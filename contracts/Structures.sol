@@ -3,12 +3,21 @@ pragma solidity ^0.4.0;
 
 library Structures {
 
-    struct Organisation {
-        string name;
-        string some_data; // TODO what does org have?
+    struct Verifier {
+        bytes32 name;
+        address administrator;
+        address[] personsApprove;
+        mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
+        bool active;
+        bool block;
+        // TODO organisation?
     }
 
-    struct Passport {
+    struct Person {
+        mapping (bytes32 => address) dataApprove; // person.dataApprove[dataHash] = verifierAddress
+        mapping (bytes32 => bool) signedDocuments;
+        address verifier;
+        // TODO passport?
         bytes32 first_name;
         bytes32 second_name;
         bytes32 last_name;
@@ -17,24 +26,8 @@ library Structures {
         bytes32 gave;
     }
 
-    struct Verifier {
-        // verifier.dataApprove[person] => dataHash
-        mapping (address => bytes32) dataApprove;
-        address[] persons;
-        address administrator;
-        Organisation organisation;
-    }
-
-    struct Person {
-        // person.dataApprove[dataHash] = verifierAddress
-        mapping (bytes32 => address) dataApprove;
-        mapping (bytes32 => bool) signedDocuments;
-        address verifier;
-        Passport passport;
-    }
-
     struct Admin {
-        string name;
+        bytes32 name;
         bool active;
         bool block;
     }
