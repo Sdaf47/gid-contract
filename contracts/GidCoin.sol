@@ -8,16 +8,24 @@ contract GidCoin is ERC20 {
     string public constant name = "Gid Coin";
     string public constant symbol = "GID";
     uint8 public constant decimals = 18;
-    uint256 public totalSupply;
+    uint256 _totalSupply;
 
     mapping (address => mapping (address => uint256)) allowed;
-    mapping (address => uint256) public balanceOf;
+    mapping (address => uint256) public balances;
 
     address private master;
 
+    function totalSupply() constant returns (uint256 totalSupply) {
+        totalSupply = _totalSupply;
+    }
+
     function GidCoin(uint256 initialSupply, address _master) {
-        balanceOf[msg.sender] = totalSupply = initialSupply;
+        balances[msg.sender] = _totalSupply = initialSupply;
         master = _master;
+    }
+
+    function balanceOf(address _owner) constant returns (uint256 balance) {
+        return balances[_owner];
     }
 
     function approve(address _spender, uint256 _value) returns (bool success) {
@@ -26,23 +34,27 @@ contract GidCoin is ERC20 {
         success = true;
     }
 
+    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
+        return allowed[_owner][_spender];
+    }
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(_to != 0x0);
-        require(balanceOf[_from] >= _value);
-        require(balanceOf[_to] + _value >= balanceOf[_to]);
+        require(balances[_from] >= _value);
+        require(balances[_to] + _value >= balances[_to]);
         require(_value > allowed[_from][msg.sender]);
-        balanceOf[_to] +=_value;
-        balanceOf[_from] -= _value;
+        balances[_to] +=_value;
+        balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         success = true;
     }
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        require(balanceOf[msg.sender] > _value);
-        require(balanceOf[_to] + _value > balanceOf[_to]);
-        balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;
+        require(balances[msg.sender] > _value);
+        require(balances[_to] + _value > balances[_to]);
+        balances[msg.sender] -= _value;
+        balances[_to] += _value;
         success = true;
     }
 
