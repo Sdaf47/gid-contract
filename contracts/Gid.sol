@@ -14,9 +14,9 @@ contract Gid is Master, GidCoin {
 
     mapping (address => Structures.Verifier) public verifiers;
 
-    function Gid() {
+    mapping (address => Structures.Video) public videos;
 
-    }
+    function Gid() payable GidCoin() {}
 
     modifier administration {
         require(administrators[msg.sender].active);
@@ -39,33 +39,35 @@ contract Gid is Master, GidCoin {
     function appointVerifier(address _candidate, bytes32 _name) administration returns (bool status) {
         address[] persons;
         Structures.Verifier memory verifier = Structures.Verifier({
-        name : _name,
-        personsApprove : persons,
-        administrator : msg.sender,
-        active : true,
-        block : false
+            name : _name,
+            personsApprove : persons,
+            administrator : msg.sender,
+            active : true,
+            block : false
         });
         verifiers[_candidate] = verifier;
     }
 
-    function createMyPerson(
-    bytes32 _first_name,
-    bytes32 _second_name,
-    bytes32 _last_name,
-    bytes32 _birthday,
-    bytes32 _number,
-    bytes32 _gave
-    ) verifier payable returns (bool status) {
+    function createMyPerson() returns (bool status) {
         persons[msg.sender] = Structures.Person({
-        verifier : 0,
-        // TODO passport
-        first_name : _first_name,
-        second_name : _second_name,
-        last_name : _last_name,
-        birthday : _birthday,
-        number : _number,
-        gave : _gave
+            verifier: 0,
+            active: true,
+            block: false
         });
+        status = true;
+    }
+
+    function startVideoProof() returns(bytes32 code) {
+        videos[msg.sender] = Structures.Video({
+            start: "YYYY-MM-DD", // now
+            hash: "nothing" // nothing
+        });
+    }
+
+    function approvePerson(address _candidate) verify returns (bool status) {
+        persons[_candidate].verifier = msg.sender;
+        verifiers[msg.sender].personsDataApprove;
+        status = true;
     }
 
 }

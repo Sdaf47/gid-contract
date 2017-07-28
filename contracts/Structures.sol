@@ -1,12 +1,19 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.13;
 
 
 library Structures {
+
+    // TODO mb passport?
+    struct Video {
+        bytes32 start;
+        bytes32 hash;
+    }
 
     struct Verifier {
         bytes32 name;
         address administrator;
         address[] personsApprove;
+        address[] personsDataApprove;
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
         bool block;
@@ -17,13 +24,8 @@ library Structures {
         mapping (bytes32 => address) dataApprove; // person.dataApprove[dataHash] = verifierAddress
         mapping (bytes32 => bool) signedDocuments;
         address verifier;
-        // TODO passport?
-        bytes32 first_name;
-        bytes32 second_name;
-        bytes32 last_name;
-        bytes32 birthday;
-        bytes32 number;
-        bytes32 gave;
+        bool active;
+        bool block;
     }
 
     struct Admin {

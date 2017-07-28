@@ -13,15 +13,12 @@ contract GidCoin is ERC20 {
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) public balances;
 
-    address private master;
-
     function totalSupply() constant returns (uint256 totalSupply) {
         totalSupply = _totalSupply;
     }
 
     function GidCoin(uint256 initialSupply, address _master) {
         balances[msg.sender] = _totalSupply = initialSupply;
-        master = _master;
     }
 
     function balanceOf(address _owner) constant returns (uint256 balance) {
