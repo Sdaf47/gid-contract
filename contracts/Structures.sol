@@ -12,7 +12,7 @@ library Structures {
     struct Verifier {
         bytes32 name;
         address administrator;
-        address[] personsApprove;
+        mapping (address => bool) personsApprove;
         address[] personsDataApprove;
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;

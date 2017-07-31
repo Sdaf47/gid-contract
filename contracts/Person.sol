@@ -12,6 +12,7 @@ contract Person {
 
     modifier approved {
         require(persons[msg.sender].active);
+        require(persons[msg.sender].block == false);
         _;
     }
 
