@@ -49,7 +49,8 @@ contract Gid is Master, GidCoin, Person {
 
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
-        verifiers[msg.sender].personsDataApprove;
+        verifiers[msg.sender].personsDataApprove.push(_candidate);
+        persons[_candidate].active = true;
         status = true;
     }
 
