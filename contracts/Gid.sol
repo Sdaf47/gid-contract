@@ -29,6 +29,11 @@ contract Gid is Master, GidCoin {
         _;
     }
 
+    modifier approved {
+        require(persons[msg.sender].active);
+        _;
+    }
+
     function appointAdministrator(address _candidate, bytes32 _name) onlyMaster returns (bool status) {
         administrators[_candidate] = Structures.Admin({
         name : _name,
@@ -72,9 +77,15 @@ contract Gid is Master, GidCoin {
         status = true;
     }
 
-    function approvePerson(address _candidate) verify returns (bool status) {
+    function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
         verifiers[msg.sender].personsDataApprove;
+        status = true;
+    }
+
+    function signDocument(butes32 hash) approved returns(bool status) {
+        // add document list with one identifier (wtf identifier we can use?)
+        persons[msg.sender].signedDocuments[hash] == true;
         status = true;
     }
 
