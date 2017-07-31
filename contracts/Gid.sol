@@ -4,17 +4,14 @@ pragma solidity ^0.4.13;
 import "./Structures.sol";
 import "./Master.sol";
 import "./GidCoin.sol";
+import "./Person.sol";
 
 
-contract Gid is Master, GidCoin {
-
-    mapping (address => Structures.Person) public persons;
+contract Gid is Master, GidCoin, Person {
 
     mapping (address => Structures.Admin) public administrators;
 
     mapping (address => Structures.Verifier) public verifiers;
-
-    mapping (address => Structures.Video) public videos;
 
     function Gid() payable GidCoin() {}
 
@@ -29,11 +26,6 @@ contract Gid is Master, GidCoin {
         _;
     }
 
-    modifier approved {
-        require(persons[msg.sender].active);
-        _;
-    }
-
     function appointAdministrator(address _candidate, bytes32 _name) onlyMaster returns (bool status) {
         administrators[_candidate] = Structures.Admin({
         name : _name,
@@ -43,10 +35,11 @@ contract Gid is Master, GidCoin {
     }
 
     function appointVerifier(address _candidate, bytes32 _name) administration returns (bool status) {
-        address[] persons;
+        address[] memory _persons;
         Structures.Verifier memory verifier = Structures.Verifier({
             name : _name,
-            personsApprove : persons,
+            personsApprove : _persons,
+            personsDataApprove : _persons,
             administrator : msg.sender,
             active : true,
             block : false
@@ -54,38 +47,9 @@ contract Gid is Master, GidCoin {
         verifiers[_candidate] = verifier;
     }
 
-    function createMyPerson() returns (bool status) {
-        persons[msg.sender] = Structures.Person({
-            verifier: 0,
-            active: false, // after verify
-            block: false
-        });
-        status = true;
-    }
-
-    function startVideoProof() returns(bytes32 code) {
-        require(!videos[msg.sender].start); // iq
-        videos[msg.sender] = Structures.Video({
-            start: now,
-            hash: "" // nothing
-        });
-    }
-
-    function saveVideoProof(bytes32 _videoHash) returns(bool status) {
-        require(videos[msg.sender].start > now);
-        videos[msg.sender].hash = _videoHash;
-        status = true;
-    }
-
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
         verifiers[msg.sender].personsDataApprove;
-        status = true;
-    }
-
-    function signDocument(butes32 hash) approved returns(bool status) {
-        // add document list with one identifier (wtf identifier we can use?)
-        persons[msg.sender].signedDocuments[hash] == true;
         status = true;
     }
 
