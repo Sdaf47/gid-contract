@@ -19,6 +19,7 @@ contract Gid is Master, GidCoin {
     function Gid() payable GidCoin() {}
 
     modifier administration {
+        // iq
         require(administrators[msg.sender].active);
         _;
     }
@@ -51,17 +52,24 @@ contract Gid is Master, GidCoin {
     function createMyPerson() returns (bool status) {
         persons[msg.sender] = Structures.Person({
             verifier: 0,
-            active: true,
+            active: false, // after verify
             block: false
         });
         status = true;
     }
 
     function startVideoProof() returns(bytes32 code) {
+        require(!videos[msg.sender].start); // iq
         videos[msg.sender] = Structures.Video({
-            start: "YYYY-MM-DD", // now
-            hash: "nothing" // nothing
+            start: now,
+            hash: "" // nothing
         });
+    }
+
+    function saveVideoProof(bytes32 _videoHash) returns(bool status) {
+        require(videos[msg.sender].start > now);
+        videos[msg.sender].hash = _videoHash;
+        status = true;
     }
 
     function approvePerson(address _candidate) verify returns (bool status) {

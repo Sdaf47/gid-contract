@@ -5,7 +5,7 @@ library Structures {
 
     // TODO mb passport?
     struct Video {
-        bytes32 start;
+        uint start;
         bytes32 hash;
     }
 
@@ -33,7 +33,5 @@ library Structures {
         bool active;
         bool block;
     }
-
-    // TODO video and start_video
 
 }
