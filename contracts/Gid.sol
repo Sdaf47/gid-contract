@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13;
+pragma solidity ^0.4.4;
 
 
 import "./Structures.sol";
@@ -13,7 +13,7 @@ contract Gid is Master, GidCoin, Person {
 
     mapping (address => Structures.Verifier) public verifiers;
 
-    function Gid() payable GidCoin() {}
+    function Gid(uint256 initialSupply, address _master) payable GidCoin(initialSupply, _master) {}
 
     modifier administration {
         // iq
