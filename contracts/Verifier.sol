@@ -2,14 +2,29 @@ pragma solidity ^0.4.4;
 
 
 import "./Structures.sol";
-import "./GidCoin.sol";
-import "./Person.sol";
+import "./Administrator.sol";
 
 
-contract Gid is GidCoin, Person {
+contract Verifier is Administrator {
 
-    function Gid(uint256 initialSupply, address _master) payable GidCoin(initialSupply, _master) {}
+    mapping (address => Structures.Verifier) public verifiers;
 
+    modifier verifier {
+        require(verifiers[msg.sender].active);
+        _;
+    }
+
+    function appointVerifier(address _candidate, bytes32 _name) administration returns (bool status) {
+        address[] memory _persons;
+        Structures.Verifier memory verifier = Structures.Verifier({
+        name : _name,
+        personsDataApprove : _persons,
+        administrator : msg.sender,
+        active : true,
+        block : false
+        });
+        verifiers[_candidate] = verifier;
+    }
 
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
