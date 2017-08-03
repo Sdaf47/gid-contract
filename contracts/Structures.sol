@@ -3,7 +3,6 @@ pragma solidity ^0.4.4;
 
 library Structures {
 
-    // TODO mb passport?
     struct Video {
         uint start;
         bytes32 hash;

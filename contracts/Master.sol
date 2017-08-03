@@ -5,7 +5,7 @@ contract Master {
 
     address public master;
 
-    function Master() payable {
+    function Master() {
         master = msg.sender;
     }
 

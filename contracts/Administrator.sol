@@ -21,6 +21,7 @@ contract Administrator is Master {
             active : true,
             block : false
         });
+        status = true;
     }
 
 }

@@ -8,8 +8,9 @@ import "./Person.sol";
 
 contract Gid is GidCoin, Person {
 
-    function Gid(uint256 initialSupply, address _master) payable GidCoin(initialSupply, _master) {}
+    function Gid(uint256 initialSupply) GidCoin(initialSupply) {}
 
+    // payable
 
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;

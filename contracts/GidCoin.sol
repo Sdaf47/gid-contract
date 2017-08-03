@@ -18,7 +18,7 @@ contract GidCoin is ERC20 {
         totalSupply = _totalSupply;
     }
 
-    function GidCoin(uint256 initialSupply, address _master) {
+    function GidCoin(uint256 initialSupply) {
         balances[msg.sender] = _totalSupply = initialSupply;
     }
 
