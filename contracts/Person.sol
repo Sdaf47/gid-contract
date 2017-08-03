@@ -17,6 +17,21 @@ contract Person is Verifier {
         _;
     }
 
+    function approvePerson(address _candidate) verifier returns (bool status) {
+        persons[_candidate].verifier = msg.sender;
+        verifiers[msg.sender].personsApprove[_candidate] = true;
+        persons[_candidate].active = true;
+        status = true;
+    }
+
+    function blockPerson(address _intruder) verifier returns (bool status) {
+        persons[_intruder].active = false;
+        persons[_intruder].block = true;
+        address _verifier = persons[_intruder].verifier;
+        verifiers[_verifier].personsApprove[_intruder] = false;
+        status = true;
+    }
+
     function createMyPerson() returns (bool status) {
         persons[msg.sender] = Structures.Person({
             verifier : 0,
@@ -43,21 +58,6 @@ contract Person is Verifier {
     function signDocument(bytes32 hash) approved returns(bool status) {
         // add document list with one identifier (wtf identifier we can use?)
         persons[msg.sender].signedDocuments[hash] == true;
-        status = true;
-    }
-
-    function approvePerson(address _candidate) verifier returns (bool status) {
-        persons[_candidate].verifier = msg.sender;
-        verifiers[msg.sender].personsApprove[_candidate] = true;
-        persons[_candidate].active = true;
-        status = true;
-    }
-
-    function blockPerson(address _intruder) verifier returns (bool status) {
-        persons[_intruder].active = false;
-        persons[_intruder].block = true;
-        address _verifier = persons[_intruder].verifier;
-        verifiers[_verifier].personsApprove[_intruder] = false;
         status = true;
     }
 
