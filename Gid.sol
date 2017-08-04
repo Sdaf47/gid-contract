@@ -21,6 +21,7 @@ contract Administrator is Master {
             active : true,
             block : false
         });
+        status = true;
     }
 
 }
@@ -63,7 +64,7 @@ contract GidCoin is ERC20 {
         totalSupply = _totalSupply;
     }
 
-    function GidCoin(uint256 initialSupply, address _master) {
+    function GidCoin(uint256 initialSupply) {
         balances[msg.sender] = _totalSupply = initialSupply;
     }
 
@@ -112,8 +113,9 @@ contract GidCoin is ERC20 {
 
 contract Gid is GidCoin, Person {
 
-    function Gid(uint256 initialSupply, address _master) payable GidCoin(initialSupply, _master) {}
+    function Gid(uint256 initialSupply) GidCoin(initialSupply) {}
 
+    // payable
 
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
@@ -138,7 +140,7 @@ contract Master {
 
     address public master;
 
-    function Master() payable {
+    function Master() {
         master = msg.sender;
     }
 
@@ -196,6 +198,7 @@ contract Person is Verifier {
         _;
     }
 
+    // verifier
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
         verifiers[msg.sender].personsApprove[_candidate] = true;
@@ -203,6 +206,7 @@ contract Person is Verifier {
         status = true;
     }
 
+    // verifier
     function blockPerson(address _intruder) verifier returns (bool status) {
         persons[_intruder].active = false;
         persons[_intruder].block = true;
@@ -211,7 +215,7 @@ contract Person is Verifier {
         status = true;
     }
 
-    function createMyPerson() returns (bool status) {
+    function createPerson() returns (bool status) {
         persons[msg.sender] = Structures.Person({
             verifier : 0,
             active : false, // after verify
@@ -221,7 +225,6 @@ contract Person is Verifier {
     }
 
     function startVideoProof() returns (bytes32 code) {
-        // iq
         videos[msg.sender] = Structures.Video({
             start : now,
             hash : "" // nothing
@@ -246,7 +249,6 @@ contract Person is Verifier {
 
 library Structures {
 
-    // TODO mb passport?
     struct Video {
         uint start;
         bytes32 hash;
