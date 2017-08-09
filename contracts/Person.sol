@@ -43,17 +43,28 @@ contract Person is Verifier {
         status = true;
     }
 
-    function startVideoProof() returns (bytes32 code) {
+    function startVideoProof() returns (bytes4 code) {
+        bytes32 bh = block.blockhash(block.number - 1);
+        bytes32 rand = sha3(msg.sender, bh);
+        code = bytes4(uint256(rand) % 1073741824);
         videos[msg.sender] = Structures.Video({
-            start : now,
-            hash : "" // nothing
+            start: now,
+            code: code,
+            hash: ""
         });
     }
 
     function saveVideoProof(bytes32 _videoHash) returns (bool status) {
-        require(videos[msg.sender].start < now);
+        require(videos[msg.sender].start <= now);
         videos[msg.sender].hash = _videoHash;
         status = true;
+    }
+
+    function checkVideoProof(bytes32 _videoHash, bytes4 code, address person) returns (bool) {
+        if (videos[person].hash == _videoHash && videos[person].code == code) {
+            return true;
+        }
+        return false;
     }
 
     function signDocument(bytes32 hash) approved returns(bool status) {
