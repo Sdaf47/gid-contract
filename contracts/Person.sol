@@ -8,7 +8,6 @@ import "./Verifier.sol";
 contract Person is Verifier {
 
     mapping (address => Structures.Person) public persons;
-
     mapping (address => Structures.Video) public videos;
 
     modifier approved {
@@ -65,12 +64,6 @@ contract Person is Verifier {
             return true;
         }
         return false;
-    }
-
-    function signDocument(bytes32 hash) approved returns(bool status) {
-        // add document list with one identifier (wtf identifier we can use?)
-        persons[msg.sender].signedDocuments[hash] == true;
-        status = true;
     }
 
 }

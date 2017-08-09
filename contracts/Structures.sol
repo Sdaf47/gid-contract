@@ -5,13 +5,14 @@ library Structures {
 
     struct Video {
         uint start;
+        bytes4 code;
         bytes32 hash;
     }
 
     struct Verifier {
         bytes32 name;
         address administrator;
-        mapping (address => bool) personsApprove;
+        address[] personsApprove;
         address[] personsDataApprove;
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
