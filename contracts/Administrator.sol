@@ -5,7 +5,7 @@ import "./Structures.sol";
 import "./Master.sol";
 
 
-contract Administrator is Master {
+contract Administrator is CrowdFunding {
 
     mapping (address => Structures.Admin) public administrators;
 

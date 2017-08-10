@@ -1,7 +1,9 @@
 pragma solidity ^0.4.15;
 
+import "./Structures.sol";
+import "./GidCoin.sol";
 
-contract CrowdFunding {
+contract CrowdFunding is GidCoin {
     address public crowdFundingOwner;
     uint public Financing;
     uint public minFinancing;
@@ -24,11 +26,6 @@ contract CrowdFunding {
         _;
     }
 
-    struct Funder {
-        uint amountTokens;
-        uint amountWei;
-    }
-
     mapping (address => Funder) public funders;
     mapping (uint => address) public fundersIterator;
 
@@ -40,7 +37,6 @@ contract CrowdFunding {
         uint valueWei = msg.value;
         uint value = valueWei / (1 ether);
 
-        // limit
         if (Financing + value > maxFinancing) {
             value = maxFinancing - Financing;
             valueWei = value * (1 ether) / etherPrice;
@@ -60,7 +56,7 @@ contract CrowdFunding {
 
         balances[msg.sender] += stake;
 
-//        Transfer(this, msg.sender, tokens);
+        Transfer(this, msg.sender, tokens);
 
         totalSupply += stake;
     }
@@ -70,7 +66,7 @@ contract CrowdFunding {
         uint _minFinancing,
         uint _maxFinancing,
         uint _crowdFundingDuration
-    ) public onlyOwner {
+    ) public onlyMaster {
         require(state == State.Disabled);
         crowdFundingStart = now;
         crowdFundingOwner = _crowdFundingOwner;
@@ -84,7 +80,7 @@ contract CrowdFunding {
         delete Financing;
     }
 
-    function completePreICO() public onlyOwner {
+    function completePreICO() public onlyMaster {
         require(state == State.PreICO);
         require(now < endCrowdFunding);
 
@@ -93,8 +89,12 @@ contract CrowdFunding {
         coefficient = ICO_COST;
         state = State.ICO;
     }
+    
+    function completeICO() public onlyMaster {
+       // TODO
+    }
 
-    function changeGasAmount(uint _amountGas) onlyOwner {
+    function changeGasAmount(uint _amountGas) onlyMaster {
         amountGas = _amountGas;
     }
 

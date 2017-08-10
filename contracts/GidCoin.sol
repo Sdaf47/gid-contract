@@ -4,23 +4,21 @@ pragma solidity ^0.4.4;
 import "./ERC20.sol";
 
 
-contract GidCoin is ERC20 {
+contract GidCoin is ERC20, Master {
     string public standard = 'Token 0.1';
     string public constant name = "Gid Coin";
     string public constant symbol = "GID";
     uint8 public constant decimals = 18;
-    uint256 _totalSupply;
+    uint256 totalSupply;
 
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) public balances;
 
-    function totalSupply() constant returns (uint256 totalSupply) {
-        totalSupply = _totalSupply;
+    function totalSupply() constant returns (uint256 _totalSupply) {
+        _totalSupply = totalSupply;
     }
 
-    function GidCoin(uint256 initialSupply) {
-        balances[msg.sender] = _totalSupply = initialSupply;
-    }
+    function GidCoin() public {}
 
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];

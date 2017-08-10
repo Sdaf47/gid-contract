@@ -17,7 +17,8 @@ library Structures {
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
         bool block;
-        // TODO organisation?
+        uint countryCode;
+        bytes32 identifier;
     }
 
     struct Person {
@@ -32,6 +33,11 @@ library Structures {
         bytes32 name;
         bool active;
         bool block;
+    }
+
+    struct Funder {
+        uint amountTokens;
+        uint amountWei;
     }
 
 }
