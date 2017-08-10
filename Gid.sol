@@ -27,6 +27,48 @@ contract Administrator is Master {
 }
 
 
+
+
+
+
+
+contract Document is Person {
+
+    function addDocument(string documentPair) approved returns (bool status) {
+        bytes32 documentHash = sha256(fields);
+        persons[msg.sender].dataApprove[documentHash] = 0x0;
+        status = true;
+    }
+
+    function checkDocument(string documentPair, address person) returns (bool) {
+        bytes32 documentHash = sha256(fields);
+        if (persons[person].dataApprove[documentHash] != 0x0) {
+            return true;
+        }
+        return false;
+    }
+
+    function getDocumentVerifier(string documentPair, address person) returns (address) {
+        bytes32 documentHash = sha256(fields);
+        return persons[person].dataApprove[documentHash];
+    }
+
+    function approveDocument(address _person, bytes32 documentHash) verifier returns (bool status) {
+        persons[person].dataApprove[documentHash] = msg.sender;
+        // todo how?
+
+        status = true;
+    }
+
+    function signDocument(bytes32 hash) approved returns(bool status) {
+        // add document list with one identifier (wtf identifier we can use?)
+        persons[msg.sender].signedDocuments[hash] == true;
+        status = true;
+    }
+
+}
+
+
 /*
  * ERC20 interface
  * see https://github.com/ethereum/EIPs/issues/20
@@ -189,7 +231,6 @@ contract Migrations {
 contract Person is Verifier {
 
     mapping (address => Structures.Person) public persons;
-
     mapping (address => Structures.Video) public videos;
 
     modifier approved {
@@ -224,23 +265,28 @@ contract Person is Verifier {
         status = true;
     }
 
-    function startVideoProof() returns (bytes32 code) {
+    function startVideoProof() returns (bytes4 code) {
+        bytes32 bh = block.blockhash(block.number - 1);
+        bytes32 rand = sha3(msg.sender, bh);
+        code = bytes4(uint256(rand) % 1073741824);
         videos[msg.sender] = Structures.Video({
-            start : now,
-            hash : "" // nothing
+            start: now,
+            code: code,
+            hash: ""
         });
     }
 
     function saveVideoProof(bytes32 _videoHash) returns (bool status) {
-        require(videos[msg.sender].start < now);
+        require(videos[msg.sender].start <= now);
         videos[msg.sender].hash = _videoHash;
         status = true;
     }
 
-    function signDocument(bytes32 hash) approved returns(bool status) {
-        // add document list with one identifier (wtf identifier we can use?)
-        persons[msg.sender].signedDocuments[hash] == true;
-        status = true;
+    function checkVideoProof(bytes32 _videoHash, bytes4 code, address person) returns (bool) {
+        if (videos[person].hash == _videoHash && videos[person].code == code) {
+            return true;
+        }
+        return false;
     }
 
 }
@@ -251,13 +297,14 @@ library Structures {
 
     struct Video {
         uint start;
+        bytes4 code;
         bytes32 hash;
     }
 
     struct Verifier {
         bytes32 name;
         address administrator;
-        mapping (address => bool) personsApprove;
+        address[] personsApprove;
         address[] personsDataApprove;
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
