@@ -26,6 +26,13 @@ contract Document is Person {
         return persons[person].dataApprove[documentHash];
     }
 
+    function approveDocument(address _person, bytes32 documentHash) verifier returns (bool status) {
+        persons[person].dataApprove[documentHash] = msg.sender;
+        // todo how?
+
+        status = true;
+    }
+
     function signDocument(bytes32 hash) approved returns(bool status) {
         // add document list with one identifier (wtf identifier we can use?)
         persons[msg.sender].signedDocuments[hash] == true;
