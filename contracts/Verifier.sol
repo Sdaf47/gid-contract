@@ -16,7 +16,7 @@ contract Verifier is Administrator {
 
     function createVerifier(uint _countryCode, bytes32 _identifier) {
         address[] memory _persons;
-        verifiers[_candidate] = Structures.Verifier({
+        verifiers[msg.sender] = Structures.Verifier({
             administrator: 0x0,
             blockedBy: 0x0,
             personsApprove: _persons,
