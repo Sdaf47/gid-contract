@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 
 import "./Structures.sol";
-import "./Master.sol";
+import "./CrowdFunding.sol";
 
 
 contract Administrator is CrowdFunding {

@@ -8,11 +8,17 @@ contract CrowdFunding is GidCoin {
     uint public Financing;
     uint public minFinancing;
     uint public maxFinancing;
+    uint public etherPrice;
     uint public amountGas = 3000000;
+    // Financing   = 50 000 000
 
-    enum State {Disabled, PreICO, CompletePreICO, ICO, Enabled}
+    // totalSupply = 100 000 000
+    // investors   = 50 000 000
+    // partners    = 19 000 000
+    // team        = 30 000 000
 
-    uint public constant PRE_ICO_COST = 250;
+    enum State {Disabled, PreICO, ICO, Enabled}
+
     uint public constant ICO_COST = 200;
 
     uint public coefficient = 0;
@@ -26,7 +32,7 @@ contract CrowdFunding is GidCoin {
         _;
     }
 
-    mapping (address => Funder) public funders;
+    mapping (address => Structures.Funder) public funders;
     mapping (uint => address) public fundersIterator;
 
     function CrowdFunding() payable {}
@@ -45,53 +51,53 @@ contract CrowdFunding is GidCoin {
         } else {
             Financing += value;
         }
-        stake = value * coefficient;
+        uint256 stake = value * coefficient;
 
         require(balances[msg.sender] + stake > balances[msg.sender]);
         require(stake > 0);
 
-        Funder storage funder = funders[msg.sender];
-        funder.amountTokens += tokens;
+        Structures.Funder storage funder = funders[msg.sender];
+        funder.amountTokens += stake;
         funder.amountWei += valueWei;
 
         balances[msg.sender] += stake;
 
-        Transfer(this, msg.sender, tokens);
+        Transfer(this, msg.sender, stake);
 
         totalSupply += stake;
     }
 
     function startPreICO(
-        address _crowdFundingOwner,
-        uint _minFinancing,
-        uint _maxFinancing,
-        uint _crowdFundingDuration
+    uint _minFinancing,
+    uint _maxFinancing,
+    uint _crowdFundingDuration,
+    uint _coefficient
     ) public onlyMaster {
         require(state == State.Disabled);
-        crowdFundingStart = now;
-        crowdFundingOwner = _crowdFundingOwner;
+        startCrowdFunding = now;
+        crowdFundingOwner = master;
         minFinancing = _minFinancing;
         endCrowdFunding = now + (_crowdFundingDuration * 1 days);
+        coefficient = _coefficient;
 
         state = State.PreICO;
-        coefficient = PRE_ICO_COST;
 
-        delete funders;
         delete Financing;
     }
 
-    function completePreICO() public onlyMaster {
+    function startICO(
+    uint _coefficient
+    ) public onlyMaster {
         require(state == State.PreICO);
         require(now < endCrowdFunding);
 
         require(crowdFundingOwner.call.gas(amountGas).value(this.balance)());
 
-        coefficient = ICO_COST;
         state = State.ICO;
     }
-    
+
     function completeICO() public onlyMaster {
-       // TODO
+        // TODO
     }
 
     function changeGasAmount(uint _amountGas) onlyMaster {

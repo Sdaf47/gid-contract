@@ -2,6 +2,7 @@ pragma solidity ^0.4.4;
 
 
 import "./ERC20.sol";
+import "./Master.sol";
 
 
 contract GidCoin is ERC20, Master {
@@ -9,7 +10,7 @@ contract GidCoin is ERC20, Master {
     string public constant name = "Gid Coin";
     string public constant symbol = "GID";
     uint8 public constant decimals = 18;
-    uint256 totalSupply;
+    uint256 public totalSupply;
 
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) public balances;

@@ -10,13 +10,11 @@ library Structures {
     }
 
     struct Verifier {
-        bytes32 name;
         address administrator;
         address[] personsApprove;
         address[] personsDataApprove;
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
-        bool block;
         uint countryCode;
         bytes32 identifier;
     }
@@ -26,13 +24,11 @@ library Structures {
         mapping (bytes32 => bool) signedDocuments;
         address verifier;
         bool active;
-        bool block;
     }
 
     struct Admin {
         bytes32 name;
         bool active;
-        bool block;
     }
 
     struct Funder {
