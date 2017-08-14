@@ -10,7 +10,6 @@ contract Administrator is CrowdFunding {
     mapping (address => Structures.Admin) public administrators;
 
     modifier administration {
-        // iq
         require(administrators[msg.sender].active);
         _;
     }
@@ -18,10 +17,13 @@ contract Administrator is CrowdFunding {
     function appointAdministrator(address _candidate, bytes32 _name) onlyMaster returns (bool status) {
         administrators[_candidate] = Structures.Admin({
             name : _name,
-            active : true,
-            block : false
+            active : true
         });
         status = true;
+    }
+
+    function dismissAdministrator(address _administrator) onlyMaster {
+        administrators[_administrator].active = false;
     }
 
 }

@@ -12,14 +12,13 @@ contract Person is Verifier {
 
     modifier approved {
         require(persons[msg.sender].active);
-        require(persons[msg.sender].block == false);
         _;
     }
 
     // verifier
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
-        verifiers[msg.sender].personsApprove[_candidate] = true;
+        verifiers[msg.sender].personsApprove.push(_candidate);
         persons[_candidate].active = true;
         status = true;
     }
@@ -27,17 +26,15 @@ contract Person is Verifier {
     // verifier
     function blockPerson(address _intruder) verifier returns (bool status) {
         persons[_intruder].active = false;
-        persons[_intruder].block = true;
         address _verifier = persons[_intruder].verifier;
-        verifiers[_verifier].personsApprove[_intruder] = false;
+        verifiers[_verifier].personsApprove.push(_intruder);
         status = true;
     }
 
     function createPerson() returns (bool status) {
         persons[msg.sender] = Structures.Person({
             verifier : 0,
-            active : false, // after verify
-            block : false
+            active : false
         });
         status = true;
     }
