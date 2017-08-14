@@ -14,16 +14,33 @@ contract Verifier is Administrator {
         _;
     }
 
-    function appointVerifier(address _candidate, bytes32 _name) administration returns (bool status) {
+    function createVerifier(uint _countryCode, bytes32 _identifier) {
         address[] memory _persons;
-        Structures.Verifier memory verifier = Structures.Verifier({
-        name : _name,
-        personsDataApprove : _persons,
-        administrator : msg.sender,
-        active : true,
-        block : false
+        verifiers[_candidate] = Structures.Verifier({
+            administrator: 0x0,
+            blockedBy: 0x0,
+            personsApprove: _persons,
+            personsDataApprove : _persons,
+            active : false,
+            countryCode: _countryCode,
+            identifier: _identifier
         });
-        verifiers[_candidate] = verifier;
+    }
+
+    function appointVerifier(address _candidate, bytes32 _name) administration {
+        require(!verifiers[_candidate].active);
+        verifiers[_candidate].administrator = msg.sender;
+        verifiers[_candidate].active = true;
+    }
+
+    function dismissVerifier(address _verifier) administration {
+        verifiers[_verifier].active = false;
+        verifiers[_verifier].blockedBy = msg.sender;
+    }
+
+    function blockVerifierCustomers(address _verifier) {
+        // dismissVerifier
+        // iter by personsApprove and personsDataApprove
     }
 
 }
