@@ -11,6 +11,7 @@ library Structures {
 
     struct Verifier {
         address administrator;
+        address blockedBy;
         address[] personsApprove;
         address[] personsDataApprove;
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
