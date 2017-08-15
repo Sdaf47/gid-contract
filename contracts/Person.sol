@@ -31,9 +31,10 @@ contract Person is Verifier {
     }
 
     function blockPerson(address _intruder) verifier returns (bool status) {
-        persons[_intruder].active = false;
-        address _verifier = persons[_intruder].verifier;
-        verifiers[_verifier].personsApprove.push(_intruder);
+        Structures.Person storage person = persons[_intruder];
+        person.active = false;
+        person.blockedBy = msg.sender;
+        verifiers[msg.sender].personsBlock.push();
         status = true;
     }
 

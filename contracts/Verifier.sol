@@ -19,6 +19,7 @@ contract Verifier is Administrator {
         verifiers[msg.sender] = Structures.Verifier({
             administrator: 0x0,
             blockedBy: 0x0,
+            personsBlock: _persons,
             personsApprove: _persons,
             personsDataApprove : _persons,
             active : false,
