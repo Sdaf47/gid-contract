@@ -5,8 +5,8 @@ import "./GidCoin.sol";
 
 contract CrowdFunding is GidCoin {
     address public master;
-    uint public Financing;
-    uint public minFinancing;
+    uint public Funding;
+    uint public minFunding;
     uint public amountGas = 3000000;
 
     uint256 constant TEAM_STAKE = 30000000;
@@ -22,6 +22,7 @@ contract CrowdFunding is GidCoin {
     State   public state = State.Disabled;
     uint    public startCrowdFunding;
     uint    public endCrowdFunding;
+    uint    public endPreICO;
 
     modifier enabledState {
         require(state == State.Enabled);
@@ -35,39 +36,50 @@ contract CrowdFunding is GidCoin {
     function CrowdFunding() payable {}
 
     function() payable {
+
+        // checking the state
         require(state == State.PreICO || state == State.ICO);
         require(now < endCrowdFunding);
+
+        // calculate stake
         uint valueWei = msg.value;
         uint256 stake = valueWei / (1 ether) * coefficient;
 
+        // check all funding
         if (balances[master] - reservedCoins - stake <= 0) {
+            // calculate max possible stake
             stake = balances[master] - reservedCoins;
             valueWei = stake * (1 ether) / coefficient;
-            Financing += valueWei;
+            Funding += valueWei;
             require(msg.sender.call.gas(amountGas).value(msg.value - valueWei)());
         } else {
-            Financing += valueWei;
+            Funding += valueWei;
         }
 
+        // make sure that is possible
         require(balances[msg.sender] + stake > balances[msg.sender]);
         require(balances[master] - reservedCoins - stake >= 0);
         require(stake > 0);
 
+        // add / update funder`s stake
         Structures.Funder storage funder = funders[msg.sender];
         funder.amountTokens += stake;
         funder.amountWei += valueWei;
 
+        // add / update user balance
         balances[msg.sender] += stake;
         balances[master] -= stake;
 
+        // push funder in iterator
         funderList.push(msg.sender);
+
         Transfer(this, msg.sender, stake);
     }
 
     function investFromFiat(address _investor, uint256 _valueWei) onlyMaster {
         uint256 stake = _valueWei / (1 ether) * coefficient;
 
-        // is it possible
+        // make sure that is possible
         require(balances[_investor] + stake > balances[_investor]);
         require(balances[master] - CONTRACT_COST - TEAM_STAKE - stake >= 0);
         require(stake > 0);
@@ -90,22 +102,31 @@ contract CrowdFunding is GidCoin {
     function startPreICO(
         uint _minFinancing,
         uint _crowdFundingDuration,
+        uint _preICODuration,
         uint _coefficient
     ) public onlyMaster {
+        // checking the state
         require(state == State.Disabled);
+
+        // initialize the environment
         startCrowdFunding = now;
-        minFinancing = _minFinancing;
+        minFunding = _minFinancing;
+        endPreICO = now + _preICODuration;
         endCrowdFunding = now + (_crowdFundingDuration * 1 days);
         coefficient = _coefficient;
 
         state = State.PreICO;
 
-        delete Financing;
+        delete Funding;
     }
 
     function completePreICO() public onlyMaster {
-        require(state == State.PreICO);
 
+        // checking the state
+        require(state == State.PreICO);
+        require(endPreICO <= now);
+
+        // send funding for ICO
         require(master.call.gas(amountGas).value(this.balance)());
 
         state = State.CompletePreICO;
@@ -114,16 +135,21 @@ contract CrowdFunding is GidCoin {
     function startICO(
         uint _coefficient
     ) public onlyMaster {
+        // checking the state
         require(state == State.CompletePreICO);
         require(now < endCrowdFunding);
 
+        // update state
         state = State.ICO;
+        coefficient = _coefficient;
     }
 
     function completeICO() public onlyMaster {
+        // checking the state
         require(state == State.ICO);
+        require(now <= endCrowdFunding);
 
-        if (minFinancing <= Financing) {
+        if (minFunding > Funding) {
             // failed
             state = State.Disabled;
         } else {
@@ -138,20 +164,40 @@ contract CrowdFunding is GidCoin {
     }
 
     function refund() public {
+        // checking the state
         require(state == State.Disabled);
-        uint value = funders[msg.sender].amountWei * 95 / 100;
+
+        // return stake to funder
+        uint value = funders[msg.sender].amountWei;
         if (value > 0) {
             delete funders[msg.sender];
             require(msg.sender.call.gas(amountGas).value(value)());
         }
     }
 
-    function timeLeftTokensSale() public constant returns (uint t) {
+    function endTokensSale() public constant returns (uint t) {
+
+        // checking the state
         require(state == State.PreICO || state == State.ICO);
+
+        // time to end
         if (now > endCrowdFunding) {
             t = 0;
         } else {
             t = endCrowdFunding - now;
+        }
+    }
+
+    function endPreICO() public constant returns (uint t) {
+
+        // checking the state
+        require(state == State.PreICO);
+
+        // time to end
+        if (now > endPreICO) {
+            t = 0;
+        } else {
+            t = endPreICO - now;
         }
     }
 }
