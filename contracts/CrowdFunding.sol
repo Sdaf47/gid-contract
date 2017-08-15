@@ -22,7 +22,6 @@ contract CrowdFunding is GidCoin {
     State   public state = State.Disabled;
     uint    public startCrowdFunding;
     uint    public endCrowdFunding;
-    uint    public endPreICO;
 
     modifier enabledState {
         require(state == State.Enabled);
@@ -69,7 +68,7 @@ contract CrowdFunding is GidCoin {
         uint256 stake = _valueWei / (1 ether) * coefficient;
 
         // is it possible
-        require(balances[_valueWei] + stake > balances[_valueWei]);
+        require(balances[_investor] + stake > balances[_investor]);
         require(balances[master] - CONTRACT_COST - TEAM_STAKE - stake >= 0);
         require(stake > 0);
 
@@ -91,13 +90,11 @@ contract CrowdFunding is GidCoin {
     function startPreICO(
         uint _minFinancing,
         uint _crowdFundingDuration,
-        uint _preICODuration,
         uint _coefficient
     ) public onlyMaster {
         require(state == State.Disabled);
         startCrowdFunding = now;
         minFinancing = _minFinancing;
-        endPreICO = now * _preICODuration;
         endCrowdFunding = now + (_crowdFundingDuration * 1 days);
         coefficient = _coefficient;
 
@@ -108,7 +105,7 @@ contract CrowdFunding is GidCoin {
 
     function completePreICO() public onlyMaster {
         require(state == State.PreICO);
-        require(now >= endPreICO);
+
         require(master.call.gas(amountGas).value(this.balance)());
 
         state = State.CompletePreICO;
