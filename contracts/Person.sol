@@ -15,7 +15,14 @@ contract Person is Verifier {
         _;
     }
 
-    // verifier
+    function createPerson() returns (bool status) {
+        persons[msg.sender] = Structures.Person({
+        verifier : 0,
+        active : false
+        });
+        status = true;
+    }
+
     function approvePerson(address _candidate) verifier returns (bool status) {
         persons[_candidate].verifier = msg.sender;
         verifiers[msg.sender].personsApprove.push(_candidate);
@@ -23,19 +30,10 @@ contract Person is Verifier {
         status = true;
     }
 
-    // verifier
     function blockPerson(address _intruder) verifier returns (bool status) {
         persons[_intruder].active = false;
         address _verifier = persons[_intruder].verifier;
         verifiers[_verifier].personsApprove.push(_intruder);
-        status = true;
-    }
-
-    function createPerson() returns (bool status) {
-        persons[msg.sender] = Structures.Person({
-            verifier : 0,
-            active : false
-        });
         status = true;
     }
 
