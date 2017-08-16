@@ -7,36 +7,35 @@ import "./Person.sol";
 
 contract Document is Person {
 
-    function addDocument(string fields) approved returns (bool status) {
-        bytes32 documentHash = sha256(fields);
-        persons[msg.sender].dataApprove[documentHash] = 0x0;
+    function addDocument(string _field, string _name) approved returns (bool status) {
+        bytes32 _documentPair = sha256(_name, _field);
+        persons[msg.sender].dataApprove[_documentPair] = 0x0;
         status = true;
     }
 
-    function checkDocument(string fields, address person) returns (bool) {
-        bytes32 documentHash = sha256(fields);
-        if (persons[person].dataApprove[documentHash] != 0x0) {
+    function checkDocument(string _field, string _name, address person) returns (bool) {
+        bytes32 _documentPair = sha256(_name, _field);
+        if (persons[person].dataApprove[_documentPair] != 0x0) {
             return true;
         }
         return false;
     }
 
-    function getDocumentVerifier(string fields, address person) returns (address) {
-        bytes32 documentHash = sha256(fields);
-        return persons[person].dataApprove[documentHash];
+    function getDocumentVerifier(string _field, string _name, address person) returns (address) {
+        bytes32 _documentPair = sha256(_name, _field);
+        return persons[person].dataApprove[_documentPair];
     }
 
-    function approveDocument(address _person, bytes32 documentHash) verifier returns (bool status) {
-        persons[_person].dataApprove[documentHash] = msg.sender;
-        // todo how?
-
+    function approveDocument(address _person, string _field, string _name) verifier returns (bool status) {
+        bytes32 _documentPair = sha256(_name, _field);
+        persons[_person].dataApprove[_documentPair] = msg.sender;
+        Structures.Verifier storage verifier = verifiers[msg.sender];
+        verifier.dataApprove[_person].push[_documentPair];
         status = true;
     }
 
-    function signDocument(bytes32 hash) approved returns(bool status) {
-        // add document list with one identifier (wtf identifier we can use?)
-        persons[msg.sender].signedDocuments[hash] == true;
-        status = true;
+    function signDocument(bytes32 _documentHash) approved returns(bool status) {
+        status = persons[msg.sender].signedDocuments[_documentHash];
     }
 
 }

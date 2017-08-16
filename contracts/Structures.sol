@@ -15,9 +15,7 @@ library Structures {
         address[] personsBlock;
         address[] personsApprove;
         address[] personsDataApprove;
-        
-        // todo
-        mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
+        mapping (address => mapping(address => bytes32[])) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
         uint countryCode;
         bytes32 identifier;
