@@ -4,7 +4,6 @@ import "./Structures.sol";
 import "./GidCoin.sol";
 
 contract CrowdFunding is GidCoin {
-    address public master;
     uint public Funding;
     uint public minFunding;
     uint public amountGas = 3000000;
@@ -31,7 +30,7 @@ contract CrowdFunding is GidCoin {
 
     address[] public funderList;
     mapping (address => Structures.Funder) public funders;
-    mapping (uint => address) public fundersIterator;
+    mapping (uint => address) public fundersList;
 
     function CrowdFunding() payable {}
 

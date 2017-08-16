@@ -2,10 +2,10 @@ pragma solidity ^0.4.4;
 
 
 import "./Structures.sol";
-import "./CrowdFunding.sol";
+import "./MigrationMaster.sol";
 
 
-contract Administrator is CrowdFunding {
+contract Administrator is MigrationMaster {
 
     mapping (address => Structures.Admin) public administrators;
 
