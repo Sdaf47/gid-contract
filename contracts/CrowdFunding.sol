@@ -14,6 +14,8 @@ contract CrowdFunding is GidCoin {
 
     uint256 public reservedCoins = TEAM_STAKE + PARTNERS_STAKE + CONTRACT_COST;
 
+    address crowdFundingOwner;
+
     enum State {Disabled, PreICO, CompletePreICO, ICO, Enabled}
 
     uint public coefficient = 0;
@@ -99,7 +101,8 @@ contract CrowdFunding is GidCoin {
         uint _minFinancing,
         uint _crowdFundingDuration,
         uint _preICODuration,
-        uint _coefficient
+        uint _coefficient,
+        address _crowdFundingOwner
     ) public onlyMaster {
         // checking the state
         require(state == State.Disabled);
@@ -110,6 +113,7 @@ contract CrowdFunding is GidCoin {
         endPreICO = now + _preICODuration;
         endCrowdFunding = now + (_crowdFundingDuration * 1 days);
         coefficient = _coefficient;
+        crowdFundingOwner = _crowdFundingOwner;
 
         state = State.PreICO;
 
@@ -123,7 +127,7 @@ contract CrowdFunding is GidCoin {
         require(endPreICO <= now);
 
         // send funding for ICO
-        require(master.call.gas(amountGas).value(this.balance)());
+        require(crowdFundingOwner.call.gas(amountGas).value(this.balance)());
 
         state = State.CompletePreICO;
     }
@@ -150,7 +154,7 @@ contract CrowdFunding is GidCoin {
             state = State.Disabled;
         } else {
             // successful crowdfunding
-            require(master.call.gas(amountGas).value(this.balance)());
+            require(crowdFundingOwner.call.gas(amountGas).value(this.balance)());
             state = State.Enabled;
         }
     }
