@@ -26,12 +26,12 @@ contract MigrationMaster is CrowdFunding {
         oldContract = _oldContract;
     }
 
-    function iterate(function(address _address) external _callable) onlyMigrationTo returns(uint) {
+    function iterate(function(address) external _callable) onlyMigrationTo returns(uint) {
         uint count = fundersList.length;
         uint i = 0;
         while(i < count) {
-            address _address = fundersList[i];
-            _callable(_address);
+            address _addr = fundersList[i];
+            _callable(_addr);
             i++;
         }
         return i;
@@ -49,7 +49,7 @@ contract MigrationMaster is CrowdFunding {
     }
 
     function migrate(address _contract) onlyMaster {
-        MigrationMaster(_contract).iterate(MigrationMaster(this).addFunder);
+        MigrationMaster(_contract).iterate(MigrationMaster(this).migrateFunder);
     }
 
 }

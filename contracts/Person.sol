@@ -17,8 +17,9 @@ contract Person is Verifier {
 
     function createPerson() returns (bool status) {
         persons[msg.sender] = Structures.Person({
-        verifier : 0,
-        active : false
+            blockedBy: 0x0,
+            verifier : 0,
+            active : false
         });
         status = true;
     }
@@ -34,7 +35,7 @@ contract Person is Verifier {
         Structures.Person storage person = persons[_intruder];
         person.active = false;
         person.blockedBy = msg.sender;
-        verifiers[msg.sender].personsBlock.push();
+        verifiers[msg.sender].personsBlock.push(_intruder);
         status = true;
     }
 

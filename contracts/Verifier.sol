@@ -28,7 +28,7 @@ contract Verifier is Administrator {
         });
     }
 
-    function appointVerifier(address _candidate, bytes32 _name) administration {
+    function appointVerifier(address _candidate) administration {
         require(!verifiers[_candidate].active);
         verifiers[_candidate].administrator = msg.sender;
         verifiers[_candidate].active = true;
@@ -39,9 +39,14 @@ contract Verifier is Administrator {
         verifiers[_verifier].blockedBy = msg.sender;
     }
 
-    function blockVerifierCustomers(address _verifier) {
-        // dismissVerifier
-        // iter by personsApprove and personsDataApprove
+    function VerifierCustomersIterator(function(address) external _iterator, address _verifier) administration {
+//    todo
+//        Structures.Verier storage verifier = verifiers[_verifier];
+//        uint current = verifier.personsApprove.length;
+//        while (current >= 0) {
+//            current--;
+//            _iterator(verifier.personsApprove[current]);
+//        }
     }
 
 }

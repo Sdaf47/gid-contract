@@ -28,9 +28,8 @@ contract CrowdFunding is GidCoin {
         _;
     }
 
-    address[] public funderList;
+    address[] public fundersList;
     mapping (address => Structures.Funder) public funders;
-    mapping (uint => address) public fundersList;
 
     function CrowdFunding() payable {}
 
@@ -70,7 +69,7 @@ contract CrowdFunding is GidCoin {
         balances[master] -= stake;
 
         // push funder in iterator
-        funderList.push(msg.sender);
+        fundersList.push(msg.sender);
 
         Transfer(this, msg.sender, stake);
     }
@@ -93,7 +92,7 @@ contract CrowdFunding is GidCoin {
         balances[master] -= stake;
 
         // push funder in iterator
-        funderList.push(_investor);
+        fundersList.push(_investor);
 
         Transfer(this, _investor, stake);
     }

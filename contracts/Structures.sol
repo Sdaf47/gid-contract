@@ -15,6 +15,8 @@ library Structures {
         address[] personsBlock;
         address[] personsApprove;
         address[] personsDataApprove;
+        
+        // todo
         mapping (address => bytes32) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
         uint countryCode;
@@ -22,6 +24,7 @@ library Structures {
     }
 
     struct Person {
+        address blockedBy;
         mapping (bytes32 => address) dataApprove; // person.dataApprove[dataHash] = verifierAddress
         mapping (bytes32 => bool) signedDocuments;
         address verifier;
