@@ -10,6 +10,8 @@ library Structures {
     }
 
     struct Verifier {
+        uint documentPrice;
+        uint personPrice;
         address administrator;
         address blockedBy;
         address[] personsBlock;

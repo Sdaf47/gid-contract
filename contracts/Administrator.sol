@@ -7,6 +7,8 @@ import "./MigrationMaster.sol";
 
 contract Administrator is MigrationMaster {
 
+    uint256 signDocumentPrice = 0;
+
     mapping (address => Structures.Admin) public administrators;
 
     modifier administration {
@@ -24,6 +26,10 @@ contract Administrator is MigrationMaster {
 
     function dismissAdministrator(address _administrator) onlyMaster {
         administrators[_administrator].active = false;
+    }
+
+    function setSignDocumentPrice(uint256 _price) onlyMaster {
+        signDocumentPrice = _price;
     }
 
 }

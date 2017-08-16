@@ -17,6 +17,8 @@ contract Verifier is Administrator {
     function createVerifier(uint _countryCode, bytes32 _identifier) {
         address[] memory _persons;
         verifiers[msg.sender] = Structures.Verifier({
+            documentPrice: 5,
+            personPrice: 10,
             administrator: 0x0,
             blockedBy: 0x0,
             personsBlock: _persons,
@@ -39,14 +41,29 @@ contract Verifier is Administrator {
         verifiers[_verifier].blockedBy = msg.sender;
     }
 
-    function VerifierCustomersIterator(function(address) external _iterator, address _verifier) administration {
-//    todo
-//        Structures.Verier storage verifier = verifiers[_verifier];
-//        uint current = verifier.personsApprove.length;
-//        while (current >= 0) {
-//            current--;
-//            _iterator(verifier.personsApprove[current]);
-//        }
+    function verifierCustomersIterator(function(address) external _iterator, address _verifier) administration {
+        Structures.Verier storage verifier = verifiers[_verifier];
+        uint count = verifier.personsApprove.length;
+        uint i = 0;
+        while (i < count) {
+            i++;
+            _iterator(verifier.personsApprove[i]);
+        }
+    }
+
+    // verification price
+    function setDocumentPrice(uint _price) verifier {
+        verifiers[msg.sender].documentPrice = _price;
+    }
+
+    // verification price
+    function setPersonPrice(uint _price) verifier {
+        verifiers[msg.sender].personPrice = _price;
+    }
+
+    function getVerifierPrices() returns(uint _documentPrice, uint _personPrice) {
+        Structures.Verifier storage _verifier = verifiers[msg.sender];
+        return (_verifier.documentPrice, _verifier.personPrice);
     }
 
 }

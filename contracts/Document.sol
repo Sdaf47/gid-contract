@@ -29,8 +29,8 @@ contract Document is Person {
     function approveDocument(address _person, string _field, string _name) verifier returns (bool status) {
         bytes32 _documentPair = sha256(_name, _field);
         persons[_person].dataApprove[_documentPair] = msg.sender;
-        Structures.Verifier storage verifier = verifiers[msg.sender];
-        verifier.dataApprove[_person].push[_documentPair];
+        Structures.Verifier storage _verifier = verifiers[msg.sender];
+        _verifier.dataApprove[_person].push[_documentPair];
         status = true;
     }
 
