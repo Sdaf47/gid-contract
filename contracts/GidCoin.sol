@@ -19,8 +19,6 @@ contract GidCoin is ERC20, Master {
         _totalSupply = totalSupply;
     }
 
-    function GidCoin() public {}
-
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }

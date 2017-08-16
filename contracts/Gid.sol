@@ -2,11 +2,9 @@ pragma solidity ^0.4.4;
 
 
 import "./Structures.sol";
-import "./CrowdFunding.sol";
-import "./Person.sol";
+import "./Document.sol";
 
 
-contract Gid is Person {
+contract Gid is Document {
 
-    function Gid() GidCoin() {}
 }

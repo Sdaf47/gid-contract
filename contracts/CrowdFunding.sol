@@ -31,8 +31,6 @@ contract CrowdFunding is GidCoin {
     address[] public fundersList;
     mapping (address => Structures.Funder) public funders;
 
-    function CrowdFunding() payable {}
-
     function() payable {
 
         // checking the state
