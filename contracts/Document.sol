@@ -27,10 +27,16 @@ contract Document is Person {
     }
 
     function approveDocument(address _person, string _field, string _name) verifier returns (bool status) {
+        Structures.Verifier storage _verifier = verifiers[msg.sender];
+        require(balances[_candidate] >= _verifier.documentPrice);
+
         bytes32 _documentPair = sha256(_name, _field);
         persons[_person].dataApprove[_documentPair] = msg.sender;
-        Structures.Verifier storage _verifier = verifiers[msg.sender];
         _verifier.dataApprove[_person].push[_documentPair];
+
+        balances[_person] -= _verifier.documentPrice;
+        balances[msg.sender] += _verifier.documentPrice;
+
         status = true;
     }
 

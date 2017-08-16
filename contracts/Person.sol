@@ -25,9 +25,16 @@ contract Person is Verifier {
     }
 
     function approvePerson(address _candidate) verifier returns (bool status) {
+        Structures.Verifier storage _verifier = verifiers[msg.sender];
+        require(balances[_candidate] >= _verifier.personPrice);
+
         persons[_candidate].verifier = msg.sender;
         verifiers[msg.sender].personsApprove.push(_candidate);
         persons[_candidate].active = true;
+
+        balances[_candidate] -= _verifier.personPrice;
+        balances[msg.sender] += _verifier.personPrice;
+
         status = true;
     }
 
