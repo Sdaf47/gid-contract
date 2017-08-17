@@ -52,4 +52,8 @@ contract MigrationMaster is CrowdFunding {
         MigrationMaster(_contract).iterate(MigrationMaster(this).migrateFunder);
     }
 
+    function migrateBalance() onlyMaster {
+        require(MigrationMaster(newContract).call.gas(amountGas).value(this.balance)());
+    }
+
 }
