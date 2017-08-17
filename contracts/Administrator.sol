@@ -8,6 +8,7 @@ import "./MigrationMaster.sol";
 contract Administrator is MigrationMaster {
 
     uint256 signDocumentPrice = 0;
+    uint256 commissionPercent = 5;
 
     mapping (address => Structures.Admin) public administrators;
 
@@ -30,6 +31,10 @@ contract Administrator is MigrationMaster {
 
     function setSignDocumentPrice(uint256 _price) onlyMaster {
         signDocumentPrice = _price;
+    }
+
+    function setCommissionPercent(uint256 _percent) onlyMaster {
+        commissionPercent = _percent;
     }
 
 }

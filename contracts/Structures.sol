@@ -16,8 +16,6 @@ library Structures {
         address blockedBy;
         address[] personsBlock;
         address[] personsApprove;
-        address[] personsDataApprove;
-        mapping (address => mapping(address => bytes32[])) dataApprove; // verifier.dataApprove[person] => dataHash
         bool active;
         uint countryCode;
         bytes32 identifier;

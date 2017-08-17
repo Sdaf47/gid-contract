@@ -23,7 +23,6 @@ contract Verifier is Administrator {
             blockedBy: 0x0,
             personsBlock: _persons,
             personsApprove: _persons,
-            personsDataApprove : _persons,
             active : false,
             countryCode: _countryCode,
             identifier: _identifier
@@ -42,7 +41,7 @@ contract Verifier is Administrator {
     }
 
     function verifierCustomersIterator(function(address) external _iterator, address _verifier) administration {
-        Structures.Verier storage verifier = verifiers[_verifier];
+        Structures.Verifier storage verifier = verifiers[_verifier];
         uint count = verifier.personsApprove.length;
         uint i = 0;
         while (i < count) {

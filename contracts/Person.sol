@@ -32,8 +32,19 @@ contract Person is Verifier {
         verifiers[msg.sender].personsApprove.push(_candidate);
         persons[_candidate].active = true;
 
-        balances[_candidate] -= _verifier.personPrice;
-        balances[msg.sender] += _verifier.personPrice;
+        // calculate commission
+        uint _commission = _verifier.personPrice * commissionPercent / 100;
+        uint _value = _verifier.personPrice - _commission;
+
+        // send price to verifier
+        balances[_candidate] -= _value;
+        balances[msg.sender] += _value;
+        Transfer(_candidate, msg.sender, _value);
+
+        // send commission to master
+        balances[_candidate] -= _commission;
+        balances[master] += _commission;
+        Transfer(_candidate, msg.sender, _value);
 
         status = true;
     }

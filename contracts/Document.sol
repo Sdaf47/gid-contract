@@ -28,19 +28,36 @@ contract Document is Person {
 
     function approveDocument(address _person, string _field, string _name) verifier returns (bool status) {
         Structures.Verifier storage _verifier = verifiers[msg.sender];
-        require(balances[_candidate] >= _verifier.documentPrice);
+        require(balances[_person] >= _verifier.documentPrice);
 
         bytes32 _documentPair = sha256(_name, _field);
         persons[_person].dataApprove[_documentPair] = msg.sender;
-        _verifier.dataApprove[_person].push[_documentPair];
 
+        // calculate commission
+        uint _commission = _verifier.documentPrice * commissionPercent / 100;
+        uint _value = _verifier.documentPrice - _commission;
+
+        // send price to verifier
         balances[_person] -= _verifier.documentPrice;
         balances[msg.sender] += _verifier.documentPrice;
+        Transfer(_person, msg.sender, _value);
+
+        // send commission to master
+        balances[_person] -= _commission;
+        balances[master] += _commission;
+        Transfer(_person, master, _commission);
 
         status = true;
     }
 
     function signDocument(bytes32 _documentHash) approved returns(bool status) {
+        require(balances[msg.sender] - signDocumentPrice > 0);
+
+        balances[msg.sender] -= signDocumentPrice;
+        balances[master] += signDocumentPrice;
+
+        Transfer(msg.sender, master, signDocumentPrice);
+
         status = persons[msg.sender].signedDocuments[_documentHash];
     }
 
