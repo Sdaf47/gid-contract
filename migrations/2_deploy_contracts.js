@@ -1,7 +1,5 @@
-var GidCoin = artifacts.require("./GidCoin.sol");
+let Gid = artifacts.require("./Gid.sol");
 
-module.exports = function(deployer) {
-  // deployer.deploy(ConvertLib);
-  // deployer.link(ConvertLib, MetaCoin);
-  deployer.deploy(GidCoin);
+module.exports = function (deployer) {
+    deployer.deploy(Gid);
 };
