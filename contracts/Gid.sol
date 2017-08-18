@@ -6,5 +6,5 @@ import "./Document.sol";
 
 
 contract Gid is Document {
-
+    function Gid() Document() {}
 }

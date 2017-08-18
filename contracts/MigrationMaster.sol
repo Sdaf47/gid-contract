@@ -8,6 +8,8 @@ contract MigrationMaster is CrowdFunding {
     address oldContract;
     address newContract;
 
+    function MigrationMaster() CrowdFunding() {}
+
     modifier onlyMigrationFrom {
         require(msg.sender == oldContract);
         _;

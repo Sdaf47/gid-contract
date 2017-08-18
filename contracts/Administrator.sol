@@ -12,6 +12,8 @@ contract Administrator is MigrationMaster {
 
     mapping (address => Structures.Admin) public administrators;
 
+    function Administrator() MigrationMaster() {}
+
     modifier administration {
         require(administrators[msg.sender].active);
         _;

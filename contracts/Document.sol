@@ -7,6 +7,8 @@ import "./Person.sol";
 
 contract Document is Person {
 
+    function Document() Person() {}
+
     function addDocument(string _field, string _name) approved returns (bool status) {
         bytes32 _documentPair = sha256(_name, _field);
         persons[msg.sender].dataApprove[_documentPair] = 0x0;

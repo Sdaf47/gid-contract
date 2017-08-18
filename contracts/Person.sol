@@ -10,6 +10,8 @@ contract Person is Verifier {
     mapping (address => Structures.Person) public persons;
     mapping (address => Structures.Video) public videos;
 
+    function Person() Verifier() {}
+
     modifier approved {
         require(persons[msg.sender].active);
         _;

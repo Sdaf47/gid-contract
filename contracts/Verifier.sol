@@ -9,6 +9,8 @@ contract Verifier is Administrator {
 
     mapping (address => Structures.Verifier) public verifiers;
 
+    function Verifier() Administrator() {}
+
     modifier verifier {
         require(verifiers[msg.sender].active);
         _;
