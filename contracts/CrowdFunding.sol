@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.4;
 
 import "./Structures.sol";
 import "./GidCoin.sol";
@@ -6,7 +6,6 @@ import "./GidCoin.sol";
 contract CrowdFunding is GidCoin {
     uint public Funding;
     uint public minFunding;
-    uint public amountGas = 3000000;
 
     uint256 constant TEAM_STAKE = 30000000;
     uint256 constant PARTNERS_STAKE = 15000000;
@@ -35,7 +34,7 @@ contract CrowdFunding is GidCoin {
 
     function CrowdFunding() GidCoin() {}
 
-    function() payable {
+    function pay() payable {
 
         // checking the state
         require(state == State.PreICO || state == State.ICO);
@@ -46,20 +45,19 @@ contract CrowdFunding is GidCoin {
         uint256 stake = valueWei / (1 ether) * coefficient;
 
         // check all funding
-        if (balances[master] - reservedCoins - stake <= 0) {
+        if (balanceOf[master] - reservedCoins - stake <= 0) {
             // calculate max possible stake
-            stake = balances[master] - reservedCoins;
+            stake = balanceOf[master] - reservedCoins;
             valueWei = stake * (1 ether) / coefficient;
-            Funding += valueWei;
-            require(msg.sender.call.gas(amountGas).value(msg.value - valueWei)());
-        } else {
-            Funding += valueWei;
+            msg.sender.transfer(msg.value - valueWei);
         }
 
         // make sure that is possible
-        require(balances[msg.sender] + stake > balances[msg.sender]);
-        require(balances[master] - reservedCoins - stake >= 0);
+        require(balanceOf[msg.sender] + stake > balanceOf[msg.sender]);
+        require(balanceOf[master] - reservedCoins - stake >= 0);
         require(stake > 0);
+
+        Funding += valueWei;
 
         // add / update funder`s stake
         Structures.Funder storage funder = funders[msg.sender];
@@ -67,21 +65,21 @@ contract CrowdFunding is GidCoin {
         funder.amountWei += valueWei;
 
         // add / update user balance
-        balances[msg.sender] += stake;
-        balances[master] -= stake;
+        balanceOf[msg.sender] += stake;
+        balanceOf[master] -= stake;
 
         // push funder in iterator
         fundersList.push(msg.sender);
 
-        Transfer(this, msg.sender, stake);
+        Transfer(master, msg.sender, stake);
     }
 
     function investFromFiat(address _investor, uint256 _valueWei) onlyMaster {
         uint256 stake = _valueWei / (1 ether) * coefficient;
 
         // make sure that is possible
-        require(balances[_investor] + stake > balances[_investor]);
-        require(balances[master] - CONTRACT_COST - TEAM_STAKE - stake >= 0);
+        require(balanceOf[_investor] + stake > balanceOf[_investor]);
+        require(balanceOf[master] - CONTRACT_COST - TEAM_STAKE - stake >= 0);
         require(stake > 0);
 
         // add / update funder`s stake
@@ -90,8 +88,8 @@ contract CrowdFunding is GidCoin {
         funder.amountWei += _valueWei;
 
         // add / update user balance
-        balances[_investor] += stake;
-        balances[master] -= stake;
+        balanceOf[_investor] += stake;
+        balanceOf[master] -= stake;
 
         // push funder in iterator
         fundersList.push(_investor);
@@ -129,7 +127,7 @@ contract CrowdFunding is GidCoin {
         require(endPreICO <= now);
 
         // send funding for ICO
-        require(crowdFundingOwner.call.gas(amountGas).value(this.balance)());
+        crowdFundingOwner.transfer(this.balance);
 
         state = State.CompletePreICO;
     }
@@ -156,13 +154,9 @@ contract CrowdFunding is GidCoin {
             state = State.Disabled;
         } else {
             // successful crowdfunding
-            require(crowdFundingOwner.call.gas(amountGas).value(this.balance)());
+            crowdFundingOwner.transfer(this.balance);
             state = State.Enabled;
         }
-    }
-
-    function changeGasAmount(uint _amountGas) onlyMaster {
-        amountGas = _amountGas;
     }
 
     function refund() public {
@@ -173,7 +167,7 @@ contract CrowdFunding is GidCoin {
         uint value = funders[msg.sender].amountWei;
         if (value > 0) {
             delete funders[msg.sender];
-            require(msg.sender.call.gas(amountGas).value(value)());
+            msg.sender.transfer(value);
         }
     }
 

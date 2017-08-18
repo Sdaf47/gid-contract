@@ -28,7 +28,7 @@ contract Person is Verifier {
 
     function approvePerson(address _candidate) verifier returns (bool status) {
         Structures.Verifier storage _verifier = verifiers[msg.sender];
-        require(balances[_candidate] >= _verifier.personPrice);
+        require(balanceOf[_candidate] >= _verifier.personPrice);
 
         persons[_candidate].verifier = msg.sender;
         verifiers[msg.sender].personsApprove.push(_candidate);
@@ -39,13 +39,13 @@ contract Person is Verifier {
         uint _value = _verifier.personPrice - _commission;
 
         // send price to verifier
-        balances[_candidate] -= _value;
-        balances[msg.sender] += _value;
+        balanceOf[_candidate] -= _value;
+        balanceOf[msg.sender] += _value;
         Transfer(_candidate, msg.sender, _value);
 
         // send commission to master
-        balances[_candidate] -= _commission;
-        balances[master] += _commission;
+        balanceOf[_candidate] -= _commission;
+        balanceOf[master] += _commission;
         Transfer(_candidate, msg.sender, _value);
 
         status = true;

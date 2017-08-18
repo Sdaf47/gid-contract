@@ -47,7 +47,7 @@ contract MigrationMaster is CrowdFunding {
     function migrateFunder(address _address) onlyMigrationFrom external {
         Structures.Funder storage funder = funders[_address];
         (funder.amountTokens, funder.amountWei) = MigrationMaster(msg.sender).getFunder(_address);
-        balances[_address] = funder.amountTokens;
+        balanceOf[_address] = funder.amountTokens;
     }
 
     function migrate(address _contract) onlyMaster {
@@ -55,7 +55,7 @@ contract MigrationMaster is CrowdFunding {
     }
 
     function migrateBalance() onlyMaster {
-        require(MigrationMaster(newContract).call.gas(amountGas).value(this.balance)());
+        newContract.transfer(this.balance);
     }
 
 }
