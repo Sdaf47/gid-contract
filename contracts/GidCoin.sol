@@ -15,6 +15,11 @@ contract GidCoin is ERC20, Master {
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) public balanceOf;
 
+    modifier onlyPayloadSize(uint size) {
+        require(msg.data.length >= size + 4);
+        _;
+    }
+
     function GidCoin() Master() {
         balanceOf[msg.sender] = totalSupply;
     }
@@ -37,7 +42,7 @@ contract GidCoin is ERC20, Master {
         return allowed[_owner][_spender];
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) returns (bool success) {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
@@ -49,7 +54,7 @@ contract GidCoin is ERC20, Master {
         success = true;
     }
 
-    function transfer(address _to, uint256 _value) returns (bool success) {
+    function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) returns (bool success) {
         require(balanceOf[msg.sender] > _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
         balanceOf[msg.sender] -= _value;
