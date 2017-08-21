@@ -11,6 +11,13 @@ contract CrowdFunding is GidCoin {
     uint256 constant PARTNERS_STAKE = 15000000;
     uint256 constant CONTRACT_COST = 5000000;
 
+    address migrationMaster;
+
+    modifier onlyMigrationMaster {
+        require(msg.sender == onlyMigrationMaster)
+        _;
+    }
+
     uint256 public reservedCoins = TEAM_STAKE + PARTNERS_STAKE + CONTRACT_COST;
 
     address crowdFundingOwner;
@@ -102,7 +109,8 @@ contract CrowdFunding is GidCoin {
         uint _crowdFundingDuration,
         uint _preICODuration,
         uint _coefficient,
-        address _crowdFundingOwner
+        address _crowdFundingOwner,
+        address _migrationMaster
     ) public onlyMaster {
         // checking the state
         require(state == State.Disabled);
@@ -114,6 +122,7 @@ contract CrowdFunding is GidCoin {
         endCrowdFunding = now + (_crowdFundingDuration * 1 days);
         coefficient = _coefficient;
         crowdFundingOwner = _crowdFundingOwner;
+        migrationMaster = _migrationMaster;
 
         state = State.PreICO;
 

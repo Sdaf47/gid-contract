@@ -8,50 +8,34 @@ contract MigrationMaster is CrowdFunding {
     address oldContract;
     address newContract;
 
+    uint iterator = 0;
+
     function MigrationMaster() CrowdFunding() {}
 
-    modifier onlyMigrationFrom {
-        require(msg.sender == oldContract);
-        _;
-    }
-
-    modifier onlyMigrationTo {
-        require(msg.sender == newContract);
-        _;
-    }
-
-    function setMigrationTo(address _newContract) onlyMaster {
+    function setMigrationTo(address _newContract) onlyMigrationMaster {
         newContract = _newContract;
     }
 
-    function setMigrationFrom(address _oldContract) onlyMaster {
+    function setMigrationFrom(address _oldContract) onlyMigrationMaster {
         oldContract = _oldContract;
     }
 
-    function iterate(function(address) external _callable) onlyMigrationTo returns(uint) {
-        uint count = fundersList.length;
-        uint i = 0;
-        while(i < count) {
-            address _addr = fundersList[i];
-            _callable(_addr);
-            i++;
-        }
-        return i;
-    }
-
-    function getFunder(address _address) onlyMigrationTo returns(uint _amountTokens, uint _amountWei) {
+    function getFunder(address _address) external returns(uint256 _amountTokens, uint256 _amountWei) {
         _amountTokens = funders[_address].amountTokens;
         _amountWei = funders[_address].amountWei;
     }
 
-    function migrateFunder(address _address) onlyMigrationFrom external {
-        Structures.Funder storage funder = funders[_address];
-        (funder.amountTokens, funder.amountWei) = MigrationMaster(msg.sender).getFunder(_address);
-        balanceOf[_address] = funder.amountTokens;
+    function getFunderAddress(uint256 _number) external returns (address _funder) {
+        return fundersList[_funder];
     }
 
-    function migrate(address _contract) onlyMaster {
-        MigrationMaster(_contract).iterate(MigrationMaster(this).migrateFunder);
+    function migrate(address _contract) onlyMaster returns(uint) {
+        _address = MigrationMaster(oldContract).getFunderAddress(iterator);
+        Structures.Funder storage funder = funders[_address];
+        (funder.amountTokens, funder.amountWei) = MigrationMaster(oldContract).getFunder(_address);
+        balanceOf[_address] = funder.amountTokens;
+        iterator += 1;
+        return iterator;
     }
 
     function migrateBalance() onlyMaster {
