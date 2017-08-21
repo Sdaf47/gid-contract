@@ -51,7 +51,8 @@ contract CrowdFunding is GidCoin {
         uint256 stake = valueWei / (1 ether) * coefficient;
 
         // check all funding
-        if (balanceOf[master] - reservedCoins - stake <= 0) {
+        if (balanceOf[master] - reservedCoins - stake <= 0 ||
+        balanceOf[master] - reservedCoins - stake > balanceOf[master]) {
             // calculate max possible stake
             stake = balanceOf[master] - reservedCoins;
             valueWei = stake * (1 ether) / coefficient;
@@ -118,7 +119,7 @@ contract CrowdFunding is GidCoin {
         startCrowdFunding = now;
         minFunding = _minFinancing;
         endPreICO = now + _preICODuration;
-        endCrowdFunding = now + (_crowdFundingDuration * 1 days);
+        endCrowdFunding = now + _crowdFundingDuration;
         coefficient = _coefficient;
         crowdFundingOwner = _crowdFundingOwner;
         migrationMaster = _migrationMaster;
@@ -179,7 +180,7 @@ contract CrowdFunding is GidCoin {
         }
     }
 
-    function endTokensSale() public constant returns (uint t) {
+    function endTokensSale() public returns (uint t) {
 
         // checking the state
         require(state == State.PreICO || state == State.ICO);
@@ -192,7 +193,7 @@ contract CrowdFunding is GidCoin {
         }
     }
 
-    function endPreICO() public constant returns (uint t) {
+    function endPreICO() public returns (uint t) {
 
         // checking the state
         require(state == State.PreICO);
