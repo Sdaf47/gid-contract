@@ -33,9 +33,7 @@ contract MigrationMaster is CrowdFunding {
         address _address = MigrationMaster(oldContract).getFunderAddress(iterator);
         Structures.Funder storage funder = funders[_address];
         (funder.amountTokens, funder.amountWei) = MigrationMaster(oldContract).getFunder(_address);
-        if (balanceOf[_address] <= 0) {
-            balanceOf[_address] = MigrationMaster(oldContract).balanceOf(_address);
-        }
+        balanceOf[_address] = MigrationMaster(oldContract).balanceOf(_address);
         iterator++;
         return iterator;
     }
