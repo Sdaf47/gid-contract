@@ -14,7 +14,7 @@ contract CrowdFunding is GidCoin {
     address migrationMaster;
 
     modifier onlyMigrationMaster {
-        require(msg.sender == onlyMigrationMaster)
+        require(msg.sender == migrationMaster);
         _;
     }
 

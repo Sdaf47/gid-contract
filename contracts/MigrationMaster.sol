@@ -26,14 +26,14 @@ contract MigrationMaster is CrowdFunding {
     }
 
     function getFunderAddress(uint256 _number) external returns (address _funder) {
-        return fundersList[_funder];
+        return fundersList[_number];
     }
 
     function migrate(address _contract) onlyMaster returns(uint) {
-        _address = MigrationMaster(oldContract).getFunderAddress(iterator);
-        Structures.Funder storage funder = funders[_address];
-        (funder.amountTokens, funder.amountWei) = MigrationMaster(oldContract).getFunder(_address);
-        balanceOf[_address] = funder.amountTokens;
+        _contract = MigrationMaster(oldContract).getFunderAddress(iterator);
+        Structures.Funder storage funder = funders[_contract];
+        (funder.amountTokens, funder.amountWei) = MigrationMaster(oldContract).getFunder(_contract);
+        balanceOf[_contract] = funder.amountTokens;
         iterator += 1;
         return iterator;
     }
