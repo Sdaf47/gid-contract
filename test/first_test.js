@@ -1,39 +1,64 @@
-const preICOParams = {
-    _minFinancing: 1000000,
-    _crowdFundingDuration: 2629743,
-    _preICODuration: 604800,
-    _coefficient: 0.1,
-    _crowdFundingOwner: "0x3b9ac89de1fa377c89bcb83bdcb4bb35e248e347"
-};
-
 let Gid = artifacts.require("Gid");
+
+const Web3 = require('web3');
+let web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 
 contract('Gid', (accounts) => {
 
-    it('should put 100000000 GID in the first account', async () => {
+    it('crowd-sale test', async () => {
         const gid = await Gid.deployed();
-        const balance = await gid.balanceOf.call(accounts[0]);
+
+        console.log('contract address', gid.address);
         const totalSupply = await gid.totalSupply.call();
-
-        console.log(accounts);
-
         assert.equal(totalSupply.valueOf(), 100000000, "total supply = 100000000");
-        assert.equal(balance.valueOf(), 100000000, "my balance = 100000000")
+
+        const account1tokens = await gid.balanceOf.call(accounts[0]);
+        assert.equal(account1tokens.valueOf(), 100000000, "account 1 balance = 100000000");
+
+        assert(accounts.length >= 3, true, "need more accounts");
+
+        await gid.startPreICO(1000000, 100, 50, 300, accounts[2]);
+        const end = await gid.endPreICO();
+
+        console.log('end of pre-ICO', end.valueOf());
+
+        for (let i = 0; i < 3; i++) {
+            logBalance('account ' + i + ' balance:', await web3.eth.getBalance(accounts[i]));
+        }
+
+        console.log('send transaction');
+        await web3.eth.sendTransaction({from: accounts[0], to: accounts[1], value: toWei(1)});
+
+        for (let i = 0; i < 3; i++) {
+            logBalance('account ' + i + ' balance:', await web3.eth.getBalance(accounts[i]));
+        }
+
+        logBalance('contract balance:', await web3.eth.getBalance(gid.address));
+        console.log('send transaction');
+
+        await web3.eth.sendTransaction({from: accounts[1], to: gid.address, value: toWei(1)});
+
+        logBalance('contract balance:', await web3.eth.getBalance(gid.address));
+
+        const account1tokens2 = await gid.balanceOf.call(accounts[0]);
+        // assert.equal(account1tokens2.valueOf(), 99999700, "account 1 balance = 99999700");
+        console.log("account 0 balance", account1tokens2.valueOf(), " gid");
+
+        const account2tokens = await gid.balanceOf.call(accounts[1]);
+        // assert.equal(account2tokens.valueOf(), 300, "account 2 balance = 300");
+        console.log("account 1 balance", account2tokens.valueOf(), " gid");
+
     });
 });
 
-// contract('Gid', async () => {
-//     let gid = await Gid.deployed();
-//
-//     it("start preICO", function() {
-//         await gid.startPreICO(preICOParams);
-//         let t = await gid.endTokensSale();
-//         console.log("time to end", t);
-//         assert.equil(t > 0, true);
-//     });
-//
-//     // it("should allow owner to add members", async function() {
-//     //     let t = await gid.endTokensSale();
-//     //     console.log("End of tokens sale", t);
-//     // });
-// });
+function toEther(wei) {
+    return wei / 1000000000000000000;
+}
+
+function toWei(ether) {
+    return ether * 1000000000000000000;
+}
+
+function logBalance(mess, balance) {
+    console.log(mess, toEther(balance) + " ether");
+}
