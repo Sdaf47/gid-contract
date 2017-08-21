@@ -12,6 +12,7 @@ contract CrowdFunding is GidCoin {
     uint256 constant CONTRACT_COST = 5000000;
 
     address migrationMaster;
+    address crowdFundingOwner;
 
     modifier onlyMigrationMaster {
         require(msg.sender == migrationMaster);
@@ -19,8 +20,6 @@ contract CrowdFunding is GidCoin {
     }
 
     uint256 public reservedCoins = TEAM_STAKE + PARTNERS_STAKE + CONTRACT_COST;
-
-    address crowdFundingOwner;
 
     enum State {Disabled, PreICO, CompletePreICO, ICO, Enabled}
 
