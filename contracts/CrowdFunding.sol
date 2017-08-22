@@ -47,7 +47,10 @@ contract CrowdFunding is GidCoin {
 
         // checking the state
         require(state == State.PreICO || state == State.ICO || state == State.PrivateFunding);
-        if (state != State.PrivateFunding) {
+        if (state == State.PreICO) {
+            require(now < endPreICO);
+        }
+        if (state == State.ICO) {
             require(now < endICO);
         }
 
@@ -122,13 +125,16 @@ contract CrowdFunding is GidCoin {
         crowdFundingOwner = _crowdFundingOwner;
         migrationMaster = _migrationMaster;
 
-        state = State.PreICO;
+        state = State.PrivateFunding;
 
         delete Funding;
     }
 
     function completePrivateFunding() onlyMaster {
         require(state == State.PrivateFunding);
+
+        crowdFundingOwner.transfer(this.balance);
+
         state = State.Disabled;
     }
 
@@ -169,13 +175,16 @@ contract CrowdFunding is GidCoin {
 
     function startICO(
         uint _coefficient,
-        uint _ICODuration
+        uint _ICODuration,
+        address _crowdFundingOwner,
+        address _migrationMaster
     ) public onlyMaster {
         // checking the state
         require(state == State.CompletePreICO);
-        require(now < endICO);
 
         endICO = now + _ICODuration;
+        crowdFundingOwner = _crowdFundingOwner;
+        migrationMaster = _migrationMaster;
 
         // update state
         state = State.ICO;
