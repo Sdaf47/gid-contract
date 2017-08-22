@@ -10,7 +10,7 @@ contract GidCoin is ERC20, Master {
     string public constant name = "Gid Coin";
     string public constant symbol = "GID";
     uint8 public constant decimals = 18;
-    uint256 public totalSupply = 100000000;
+    uint256 public totalSupply = 100000000000000000000000000;
 
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) public balanceOf;

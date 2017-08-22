@@ -29,6 +29,14 @@ contract MigrationMaster is CrowdFunding {
         return fundersList[_number];
     }
 
+    function startMigration() onlyMaster {
+        state = State.Migration;
+    }
+
+    function stopMigration() onlyMaster {
+        state = State.Disabled;
+    }
+
     function migrate() onlyMaster returns(uint) {
         address _address = MigrationMaster(oldContract).getFunderAddress(iterator);
         Structures.Funder storage funder = funders[_address];
