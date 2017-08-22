@@ -87,7 +87,7 @@ contract GidCoin is ERC20, Master {
     string public constant name = "Gid Coin";
     string public constant symbol = "GID";
     uint8 public constant decimals = 18;
-    uint256 public totalSupply = 100000000;
+    uint256 public totalSupply = 100000000000000000000000000;
 
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) public balanceOf;
@@ -146,9 +146,9 @@ contract CrowdFunding is GidCoin {
     uint public Funding;
     uint public minFunding;
 
-    uint256 constant TEAM_STAKE = 30000000;
-    uint256 constant PARTNERS_STAKE = 15000000;
-    uint256 constant CONTRACT_COST = 5000000;
+    uint256 constant TEAM_STAKE = 30000000000000000000000000;
+    uint256 constant PARTNERS_STAKE = 15000000000000000000000000;
+    uint256 constant CONTRACT_COST = 5000000000000000000000000;
 
     address migrationMaster;
     address crowdFundingOwner;
@@ -160,13 +160,13 @@ contract CrowdFunding is GidCoin {
 
     uint256 public reservedCoins = TEAM_STAKE + PARTNERS_STAKE + CONTRACT_COST;
 
-    enum State {Disabled, PreICO, CompletePreICO, ICO, Enabled}
+    enum State {Disabled, PrivateFunding, PreICO, CompletePreICO, ICO, Enabled, Migration}
 
     uint public coefficient = 0;
 
     State   public state = State.Disabled;
     uint    public startCrowdFunding;
-    uint    public endCrowdFunding;
+    uint    public endICO;
     uint    public endPreICO;
 
     modifier enabledState {
@@ -179,21 +179,27 @@ contract CrowdFunding is GidCoin {
 
     function CrowdFunding() GidCoin() {}
 
-    function pay() payable {
+    function () payable {
+        if (state == State.Migration) {
+            return;
+        }
 
         // checking the state
-        require(state == State.PreICO || state == State.ICO);
-        require(now < endCrowdFunding);
+        require(state == State.PreICO || state == State.ICO || state == State.PrivateFunding);
+        if (state != State.PrivateFunding) {
+            require(now < endICO);
+        }
 
         // calculate stake
         uint valueWei = msg.value;
-        uint256 stake = valueWei / (1 ether) * coefficient;
+        uint256 stake = valueWei * coefficient;
 
         // check all funding
-        if (balanceOf[master] - reservedCoins - stake <= 0) {
+        if (balanceOf[master] - reservedCoins - stake <= 0 ||
+            balanceOf[master] - reservedCoins - stake > balanceOf[master]) {
             // calculate max possible stake
             stake = balanceOf[master] - reservedCoins;
-            valueWei = stake * (1 ether) / coefficient;
+            valueWei = stake / coefficient;
             msg.sender.transfer(msg.value - valueWei);
         }
 
@@ -220,7 +226,7 @@ contract CrowdFunding is GidCoin {
     }
 
     function investFromFiat(address _investor, uint256 _valueWei) onlyMaster {
-        uint256 stake = _valueWei / (1 ether) * coefficient;
+        uint256 stake = _valueWei * coefficient;
 
         // make sure that is possible
         require(balanceOf[_investor] + stake > balanceOf[_investor]);
@@ -242,9 +248,31 @@ contract CrowdFunding is GidCoin {
         Transfer(this, _investor, stake);
     }
 
+    function startPrivateFunding(
+        uint _coefficient,
+        address _crowdFundingOwner,
+        address _migrationMaster
+    ) public onlyMaster {
+        // checking the state
+        require(state == State.Disabled);
+
+        // initialize the environment
+        coefficient = _coefficient;
+        crowdFundingOwner = _crowdFundingOwner;
+        migrationMaster = _migrationMaster;
+
+        state = State.PreICO;
+
+        delete Funding;
+    }
+
+    function completePrivateFunding() onlyMaster {
+        require(state == State.PrivateFunding);
+        state = State.Disabled;
+    }
+
     function startPreICO(
         uint _minFinancing,
-        uint _crowdFundingDuration,
         uint _preICODuration,
         uint _coefficient,
         address _crowdFundingOwner,
@@ -257,7 +285,6 @@ contract CrowdFunding is GidCoin {
         startCrowdFunding = now;
         minFunding = _minFinancing;
         endPreICO = now + _preICODuration;
-        endCrowdFunding = now + (_crowdFundingDuration * 1 days);
         coefficient = _coefficient;
         crowdFundingOwner = _crowdFundingOwner;
         migrationMaster = _migrationMaster;
@@ -280,11 +307,14 @@ contract CrowdFunding is GidCoin {
     }
 
     function startICO(
-        uint _coefficient
+        uint _coefficient,
+        uint _ICODuration
     ) public onlyMaster {
         // checking the state
         require(state == State.CompletePreICO);
-        require(now < endCrowdFunding);
+        require(now < endICO);
+
+        endICO = now + _ICODuration;
 
         // update state
         state = State.ICO;
@@ -294,7 +324,7 @@ contract CrowdFunding is GidCoin {
     function completeICO() public onlyMaster {
         // checking the state
         require(state == State.ICO);
-        require(now <= endCrowdFunding);
+        require(now <= endICO);
 
         if (minFunding > Funding) {
             // failed
@@ -318,20 +348,20 @@ contract CrowdFunding is GidCoin {
         }
     }
 
-    function endTokensSale() public constant returns (uint t) {
+    function endICO() public returns (uint t) {
 
         // checking the state
-        require(state == State.PreICO || state == State.ICO);
+        require(state == State.ICO);
 
         // time to end
-        if (now > endCrowdFunding) {
+        if (now > endICO) {
             t = 0;
         } else {
-            t = endCrowdFunding - now;
+            t = endICO - now;
         }
     }
 
-    function endPreICO() public constant returns (uint t) {
+    function endPreICO() public returns (uint t) {
 
         // checking the state
         require(state == State.PreICO);
@@ -371,13 +401,19 @@ contract MigrationMaster is CrowdFunding {
         return fundersList[_number];
     }
 
+    function startMigration() onlyMaster {
+        state = State.Migration;
+    }
+
+    function stopMigration() onlyMaster {
+        state = State.Disabled;
+    }
+
     function migrate() onlyMaster returns(uint) {
         address _address = MigrationMaster(oldContract).getFunderAddress(iterator);
         Structures.Funder storage funder = funders[_address];
         (funder.amountTokens, funder.amountWei) = MigrationMaster(oldContract).getFunder(_address);
-        if (balanceOf[_address] <= 0) {
-            balanceOf[_address] = MigrationMaster(oldContract).balanceOf(_address);
-        }
+        balanceOf[_address] = MigrationMaster(oldContract).balanceOf(_address);
         iterator++;
         return iterator;
     }
