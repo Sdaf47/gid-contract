@@ -14,8 +14,6 @@ library Structures {
         uint personPrice;
         address administrator;
         address blockedBy;
-        address[] personsBlock;
-        address[] personsApprove;
         bool active;
         uint countryCode;
         bytes32 identifier;
@@ -186,7 +184,10 @@ contract CrowdFunding is GidCoin {
 
         // checking the state
         require(state == State.PreICO || state == State.ICO || state == State.PrivateFunding);
-        if (state != State.PrivateFunding) {
+        if (state == State.PreICO) {
+            require(now < endPreICO);
+        }
+        if (state == State.ICO) {
             require(now < endICO);
         }
 
@@ -261,13 +262,16 @@ contract CrowdFunding is GidCoin {
         crowdFundingOwner = _crowdFundingOwner;
         migrationMaster = _migrationMaster;
 
-        state = State.PreICO;
+        state = State.PrivateFunding;
 
         delete Funding;
     }
 
     function completePrivateFunding() onlyMaster {
         require(state == State.PrivateFunding);
+
+        crowdFundingOwner.transfer(this.balance);
+
         state = State.Disabled;
     }
 
@@ -308,13 +312,16 @@ contract CrowdFunding is GidCoin {
 
     function startICO(
         uint _coefficient,
-        uint _ICODuration
+        uint _ICODuration,
+        address _crowdFundingOwner,
+        address _migrationMaster
     ) public onlyMaster {
         // checking the state
         require(state == State.CompletePreICO);
-        require(now < endICO);
 
         endICO = now + _ICODuration;
+        crowdFundingOwner = _crowdFundingOwner;
+        migrationMaster = _migrationMaster;
 
         // update state
         state = State.ICO;
@@ -478,14 +485,11 @@ contract Verifier is Administrator {
     }
 
     function createVerifier(uint _countryCode, bytes32 _identifier) {
-        address[] memory _persons;
         verifiers[msg.sender] = Structures.Verifier({
             documentPrice: 5,
             personPrice: 10,
             administrator: 0x0,
             blockedBy: 0x0,
-            personsBlock: _persons,
-            personsApprove: _persons,
             active : false,
             countryCode: _countryCode,
             identifier: _identifier
@@ -501,16 +505,6 @@ contract Verifier is Administrator {
     function dismissVerifier(address _verifier) administration {
         verifiers[_verifier].active = false;
         verifiers[_verifier].blockedBy = msg.sender;
-    }
-
-    function verifierCustomersIterator(function(address) external _iterator, address _verifier) administration {
-        Structures.Verifier storage verifier = verifiers[_verifier];
-        uint count = verifier.personsApprove.length;
-        uint i = 0;
-        while (i < count) {
-            i++;
-            _iterator(verifier.personsApprove[i]);
-        }
     }
 
     // verification price
@@ -559,7 +553,6 @@ contract Person is Verifier {
         require(balanceOf[_candidate] >= _verifier.personPrice);
 
         persons[_candidate].verifier = msg.sender;
-        verifiers[msg.sender].personsApprove.push(_candidate);
         persons[_candidate].active = true;
 
         // calculate commission
@@ -583,7 +576,6 @@ contract Person is Verifier {
         Structures.Person storage person = persons[_intruder];
         person.active = false;
         person.blockedBy = msg.sender;
-        verifiers[msg.sender].personsBlock.push(_intruder);
         status = true;
     }
 
