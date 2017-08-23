@@ -137,6 +137,12 @@ contract GidCoin is ERC20, Master {
         success = true;
     }
 
+    function mintTokens(uint256 _tokens) onlyMaster {
+        uint256 _count = _tokens * 1000000000000000000;
+        totalSupply += _count;
+        balanceOf[master] += _tokens;
+    }
+
 }
 
 
@@ -246,7 +252,7 @@ contract CrowdFunding is GidCoin {
         // push funder in iterator
         fundersList.push(_investor);
 
-        Transfer(this, _investor, stake);
+        Transfer(master, _investor, stake);
     }
 
     function startPrivateFunding(
@@ -427,6 +433,9 @@ contract MigrationMaster is CrowdFunding {
     }
 
     function migrateBalance() onlyMaster {
+        require(newContract != 0x0);
+        require(state == State.Migration);
+
         newContract.transfer(this.balance);
     }
 
