@@ -209,6 +209,7 @@ contract CrowdFunding is GidCoin {
     function refund() public {
         // checking the state
         require(state == State.Disabled);
+        require(Funding < minFunding);
 
         // return stake to funder
         uint value = funders[msg.sender].amountWei;
