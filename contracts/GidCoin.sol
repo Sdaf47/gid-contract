@@ -62,4 +62,10 @@ contract GidCoin is ERC20, Master {
         success = true;
     }
 
+    function mintTokens(uint256 _tokens) onlyMaster {
+        uint256 _count = _tokens * 1000000000000000000;
+        totalSupply += _count;
+        balanceOf[master] += _tokens;
+    }
+
 }
