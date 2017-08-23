@@ -47,6 +47,9 @@ contract MigrationMaster is CrowdFunding {
     }
 
     function migrateBalance() onlyMaster {
+        require(newContract != 0x0);
+        require(state == State.Migration);
+
         newContract.transfer(this.balance);
     }
 

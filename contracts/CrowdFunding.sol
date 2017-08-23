@@ -109,7 +109,7 @@ contract CrowdFunding is GidCoin {
         // push funder in iterator
         fundersList.push(_investor);
 
-        Transfer(this, _investor, stake);
+        Transfer(master, _investor, stake);
     }
 
     function startPrivateFunding(
