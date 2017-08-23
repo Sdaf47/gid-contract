@@ -31,7 +31,6 @@ contract Person is Verifier {
         require(balanceOf[_candidate] >= _verifier.personPrice);
 
         persons[_candidate].verifier = msg.sender;
-        verifiers[msg.sender].personsApprove.push(_candidate);
         persons[_candidate].active = true;
 
         // calculate commission
@@ -55,7 +54,6 @@ contract Person is Verifier {
         Structures.Person storage person = persons[_intruder];
         person.active = false;
         person.blockedBy = msg.sender;
-        verifiers[msg.sender].personsBlock.push(_intruder);
         status = true;
     }
 

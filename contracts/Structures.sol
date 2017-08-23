@@ -14,8 +14,6 @@ library Structures {
         uint personPrice;
         address administrator;
         address blockedBy;
-        address[] personsBlock;
-        address[] personsApprove;
         bool active;
         uint countryCode;
         bytes32 identifier;
