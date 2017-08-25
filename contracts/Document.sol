@@ -60,6 +60,14 @@ contract Document is Person {
 
         Transfer(msg.sender, master, signDocumentPrice);
 
+        persons[msg.sender].signedDocuments[_documentHash] = true;
+
+        status = true;
+    }
+
+    function checkSign(bytes32 _documentHash) approved returns(bool status) {
+        require(balanceOf[msg.sender] - signDocumentPrice > 0);
+
         status = persons[msg.sender].signedDocuments[_documentHash];
     }
 
