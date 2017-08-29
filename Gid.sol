@@ -150,10 +150,6 @@ contract CrowdFunding is GidCoin {
     uint public Funding;
     uint public minFunding;
 
-    uint256 constant TEAM_STAKE = 30000000000000000000000000;
-    uint256 constant PARTNERS_STAKE = 15000000000000000000000000;
-    uint256 constant CONTRACT_COST = 5000000000000000000000000;
-
     address migrationMaster;
     address crowdFundingOwner;
 
@@ -162,7 +158,7 @@ contract CrowdFunding is GidCoin {
         _;
     }
 
-    uint256 public reservedCoins = TEAM_STAKE + PARTNERS_STAKE + CONTRACT_COST;
+    uint256 public reservedCoins = 36000000000000000000000000;
 
     enum State {Disabled, PrivateFunding, PreICO, CompletePreICO, ICO, Enabled, Migration}
 
@@ -237,7 +233,7 @@ contract CrowdFunding is GidCoin {
 
         // make sure that is possible
         require(balanceOf[_investor] + stake > balanceOf[_investor]);
-        require(balanceOf[master] - CONTRACT_COST - TEAM_STAKE - stake >= 0);
+        require(balanceOf[master] - reservedCoins - stake >= 0);
         require(stake > 0);
 
         // add / update funder`s stake
