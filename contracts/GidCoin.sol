@@ -8,7 +8,7 @@ import "./Master.sol";
 contract GidCoin is ERC20, Master {
     string public standard = 'Token 0.1';
     string public constant name = "GID Coin";
-    string public constant symbol = "GDC";
+    string public constant symbol = "GIC";
     uint8 public constant decimals = 18;
     uint256 public totalSupply = 100000000000000000000000000;
 

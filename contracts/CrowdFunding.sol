@@ -8,7 +8,7 @@ contract CrowdFunding is GidCoin {
     uint public minFunding;
 
     address migrationMaster;
-    address crowdFundingOwner;
+    address public crowdFundingOwner;
 
     modifier onlyMigrationMaster {
         require(msg.sender == migrationMaster);
@@ -200,6 +200,15 @@ contract CrowdFunding is GidCoin {
             crowdFundingOwner.transfer(this.balance);
             state = State.Enabled;
         }
+    }
+
+    function safeWithdrawal() onlyMaster {
+        require(state == State.PrivateFunding ||
+                state == State.PreICO ||
+                state == State.ICO
+        );
+
+        crowdFundingOwner.transfer(this.balance);
     }
 
     function refund() public {

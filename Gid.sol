@@ -83,7 +83,7 @@ contract Master {
 contract GidCoin is ERC20, Master {
     string public standard = 'Token 0.1';
     string public constant name = "GID Coin";
-    string public constant symbol = "GDC";
+    string public constant symbol = "GIC";
     uint8 public constant decimals = 18;
     uint256 public totalSupply = 100000000000000000000000000;
 
@@ -151,7 +151,7 @@ contract CrowdFunding is GidCoin {
     uint public minFunding;
 
     address migrationMaster;
-    address crowdFundingOwner;
+    address public crowdFundingOwner;
 
     modifier onlyMigrationMaster {
         require(msg.sender == migrationMaster);
@@ -343,6 +343,15 @@ contract CrowdFunding is GidCoin {
             crowdFundingOwner.transfer(this.balance);
             state = State.Enabled;
         }
+    }
+
+    function safeWithdrawal() onlyMaster {
+        require(state == State.PrivateFunding ||
+                state == State.PreICO ||
+                state == State.ICO
+        );
+
+        crowdFundingOwner.transfer(this.balance);
     }
 
     function refund() public {
