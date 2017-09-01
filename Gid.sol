@@ -195,6 +195,12 @@ contract CrowdFunding is GidCoin {
 
         // calculate stake
         uint valueWei = msg.value;
+
+        // limitation
+        if (state == State.PrivateFunding) {
+            require(valueWei > 25125628100000000000);
+        }
+
         uint256 stake = valueWei * coefficient;
 
         // check all funding
