@@ -7,6 +7,8 @@ import "./Verifier.sol";
 
 contract Person is Verifier {
 
+    event Verify(address verifier, address person);
+
     mapping (address => Structures.Person) public persons;
     mapping (address => Structures.Video) public videos;
 
@@ -47,6 +49,7 @@ contract Person is Verifier {
         balanceOf[_candidate] -= _commission;
         balanceOf[master] += _commission;
         Transfer(_candidate, msg.sender, _value);
+        Verify(msg.sender, _candidate);
 
         status = true;
     }

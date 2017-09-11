@@ -19,9 +19,8 @@ contract Administrator is MigrationMaster {
         _;
     }
 
-    function appointAdministrator(address _candidate, bytes32 _name) onlyMaster returns (bool status) {
+    function appointAdministrator(address _candidate) onlyMaster returns (bool status) {
         administrators[_candidate] = Structures.Admin({
-            name : _name,
             active : true
         });
         status = true;

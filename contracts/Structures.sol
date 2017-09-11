@@ -28,7 +28,6 @@ library Structures {
     }
 
     struct Admin {
-        bytes32 name;
         bool active;
     }
 

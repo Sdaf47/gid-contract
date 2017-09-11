@@ -28,7 +28,6 @@ library Structures {
     }
 
     struct Admin {
-        bytes32 name;
         bool active;
     }
 
@@ -198,7 +197,7 @@ contract CrowdFunding is GidCoin {
 
         // limitation
         if (state == State.PrivateFunding) {
-            require(valueWei > 25125628100000000000);
+            require(valueWei > 30000000000000000000);
         }
 
         uint256 stake = valueWei * coefficient;
@@ -234,8 +233,8 @@ contract CrowdFunding is GidCoin {
         Transfer(master, msg.sender, stake);
     }
 
-    function investFromFiat(address _investor, uint256 _valueWei) onlyMaster {
-        uint256 stake = _valueWei * coefficient;
+    function investFromFiat(address _investor, uint256 _value) onlyMaster {
+        uint256 stake = _value;
 
         // make sure that is possible
         require(balanceOf[_investor] + stake > balanceOf[_investor]);
@@ -245,11 +244,13 @@ contract CrowdFunding is GidCoin {
         // add / update funder`s stake
         Structures.Funder storage funder = funders[_investor];
         funder.amountTokens += stake;
-        funder.amountWei += _valueWei;
+        funder.amountWei += 0;
 
         // add / update user balance
         balanceOf[_investor] += stake;
         balanceOf[master] -= stake;
+
+        Funding += _value / coefficient;
 
         // push funder in iterator
         fundersList.push(_investor);
@@ -271,8 +272,6 @@ contract CrowdFunding is GidCoin {
         migrationMaster = _migrationMaster;
 
         state = State.PrivateFunding;
-
-        delete Funding;
     }
 
     function completePrivateFunding() onlyMaster {
@@ -469,9 +468,8 @@ contract Administrator is MigrationMaster {
         _;
     }
 
-    function appointAdministrator(address _candidate, bytes32 _name) onlyMaster returns (bool status) {
+    function appointAdministrator(address _candidate) onlyMaster returns (bool status) {
         administrators[_candidate] = Structures.Admin({
-            name : _name,
             active : true
         });
         status = true;
@@ -551,6 +549,8 @@ contract Verifier is Administrator {
 
 contract Person is Verifier {
 
+    event Verify(address verifier, address person);
+
     mapping (address => Structures.Person) public persons;
     mapping (address => Structures.Video) public videos;
 
@@ -591,6 +591,7 @@ contract Person is Verifier {
         balanceOf[_candidate] -= _commission;
         balanceOf[master] += _commission;
         Transfer(_candidate, msg.sender, _value);
+        Verify(msg.sender, _candidate);
 
         status = true;
     }
@@ -632,6 +633,9 @@ contract Person is Verifier {
 
 
 contract Document is Person {
+
+    event VerifyDocument(address verifier, address person, bytes32 document);
+    event SignDocument(address person, bytes32 document);
 
     function Document() Person() {}
 
@@ -675,6 +679,8 @@ contract Document is Person {
         balanceOf[master] += _commission;
         Transfer(_person, master, _commission);
 
+        VerifyDocument(msg.sender, _person, _documentPair);
+
         status = true;
     }
 
@@ -687,6 +693,8 @@ contract Document is Person {
         Transfer(msg.sender, master, signDocumentPrice);
 
         persons[msg.sender].signedDocuments[_documentHash] = true;
+
+        SignDocument(msg.sender, _documentHash);
 
         status = true;
     }

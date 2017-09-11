@@ -55,7 +55,7 @@ contract CrowdFunding is GidCoin {
 
         // limitation
         if (state == State.PrivateFunding) {
-            require(valueWei > 25125628100000000000);
+            require(valueWei > 30000000000000000000);
         }
 
         uint256 stake = valueWei * coefficient;
@@ -91,8 +91,8 @@ contract CrowdFunding is GidCoin {
         Transfer(master, msg.sender, stake);
     }
 
-    function investFromFiat(address _investor, uint256 _valueWei) onlyMaster {
-        uint256 stake = _valueWei * coefficient;
+    function investFromFiat(address _investor, uint256 _value) onlyMaster {
+        uint256 stake = _value;
 
         // make sure that is possible
         require(balanceOf[_investor] + stake > balanceOf[_investor]);
@@ -102,11 +102,13 @@ contract CrowdFunding is GidCoin {
         // add / update funder`s stake
         Structures.Funder storage funder = funders[_investor];
         funder.amountTokens += stake;
-        funder.amountWei += _valueWei;
+        funder.amountWei += 0;
 
         // add / update user balance
         balanceOf[_investor] += stake;
         balanceOf[master] -= stake;
+
+        Funding += _value / coefficient;
 
         // push funder in iterator
         fundersList.push(_investor);
@@ -128,8 +130,6 @@ contract CrowdFunding is GidCoin {
         migrationMaster = _migrationMaster;
 
         state = State.PrivateFunding;
-
-        delete Funding;
     }
 
     function completePrivateFunding() onlyMaster {

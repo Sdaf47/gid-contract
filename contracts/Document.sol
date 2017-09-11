@@ -7,6 +7,9 @@ import "./Person.sol";
 
 contract Document is Person {
 
+    event VerifyDocument(address verifier, address person, bytes32 document);
+    event SignDocument(address person, bytes32 document);
+
     function Document() Person() {}
 
     function addDocument(string _field, string _name) approved returns (bool status) {
@@ -49,6 +52,8 @@ contract Document is Person {
         balanceOf[master] += _commission;
         Transfer(_person, master, _commission);
 
+        VerifyDocument(msg.sender, _person, _documentPair);
+
         status = true;
     }
 
@@ -61,6 +66,8 @@ contract Document is Person {
         Transfer(msg.sender, master, signDocumentPrice);
 
         persons[msg.sender].signedDocuments[_documentHash] = true;
+
+        SignDocument(msg.sender, _documentHash);
 
         status = true;
     }
