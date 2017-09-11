@@ -561,6 +561,7 @@ contract Person is Verifier {
     }
 
     function createPerson() returns (bool status) {
+        require(!persons[msg.sender].active);
         persons[msg.sender] = Structures.Person({
             blockedBy: 0x0,
             verifier : 0,
