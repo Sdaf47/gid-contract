@@ -506,6 +506,7 @@ contract Verifier is Administrator {
     }
 
     function createVerifier(uint _countryCode, bytes32 _identifier) {
+        require(!verifiers[msg.sender].active);
         verifiers[msg.sender] = Structures.Verifier({
             documentPrice: 5,
             personPrice: 10,
